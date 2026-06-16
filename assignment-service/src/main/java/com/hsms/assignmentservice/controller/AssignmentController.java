@@ -1,4 +1,4 @@
-package com.hsms.controller;
+package com.hsms.assignmentservice.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 import com.hsms.entity.AssignmentStatus;
