@@ -6,3 +6,4 @@ bin/
 *.log
 .idea/
 *.iml
+/.metadata/
