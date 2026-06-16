@@ -5,6 +5,10 @@ import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.hsms.request.dto.Customer;
+import com.hsms.request.dto.ServiceCategory;
+import com.hsms.request.enums.ServiceRequestStatus;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
