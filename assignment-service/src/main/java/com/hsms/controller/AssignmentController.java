@@ -22,7 +22,7 @@ public class AssignmentController {
 	public ResponseEntity<AssignmentResponseDTO> assignTechnician(@RequestBody AssignmentRequestDTO requestDTO) {
 		return ResponseEntity.ok(assignmentService.assignTechnician(requestDTO));
 	}
-
+	
 	@GetMapping("/{id}")
 	public ResponseEntity<AssignmentDetailResponseDTO> getAssignmentById(@PathVariable Long id) {
 		return ResponseEntity.ok(assignmentService.getAssignmentById(id));
