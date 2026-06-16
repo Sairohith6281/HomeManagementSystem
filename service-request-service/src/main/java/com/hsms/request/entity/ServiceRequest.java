@@ -5,23 +5,30 @@ import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.hsms.request.dto.Assignment;
 import com.hsms.request.dto.Customer;
+import com.hsms.request.dto.Feedback;
+import com.hsms.request.dto.Payment;
 import com.hsms.request.dto.ServiceCategory;
+import com.hsms.request.dto.ServiceRecord;
 import com.hsms.request.enums.ServiceRequestStatus;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+
 
 @Entity
 @Table(name = "service_requests")
