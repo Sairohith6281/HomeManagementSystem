@@ -1,8 +1,14 @@
 package com.hsms.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import com.hsms.entity.Assignment;
+import com.hsms.entity.AssignmentStatus;
 
 public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
+
+	boolean existsByTechnicianIdAndStatusIn(Long technicianId, List<AssignmentStatus> status);
+	boolean existsByServiceRequestId(Long serviceRequestId);
 	
 }

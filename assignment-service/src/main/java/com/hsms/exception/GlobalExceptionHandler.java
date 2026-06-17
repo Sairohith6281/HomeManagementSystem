@@ -16,8 +16,8 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
-    @ExceptionHandler(CustomerNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleBusiness(CustomerNotFoundException ex) {
+    @ExceptionHandler(TechnicianNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleBusiness(TechnicianNotFoundException ex) {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 

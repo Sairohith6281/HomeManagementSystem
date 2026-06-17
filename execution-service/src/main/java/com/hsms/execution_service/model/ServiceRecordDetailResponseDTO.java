@@ -17,4 +17,5 @@ public class ServiceRecordDetailResponseDTO {
     private LocalDateTime endTime;
     private String remarks;
     private Double actualCost;
+    private String paymentMethod;
 }
