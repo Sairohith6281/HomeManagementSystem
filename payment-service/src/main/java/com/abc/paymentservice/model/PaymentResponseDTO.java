@@ -1,5 +1,7 @@
 package com.abc.paymentservice.model;
 
+import com.abc.paymentservice.enums.PaymentStatus;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,5 +11,5 @@ public class PaymentResponseDTO {
 
     private Long paymentId;
     private Long serviceRequestId;
-    private String status;
+    private PaymentStatus status;
 }

@@ -1,5 +1,9 @@
 package com.abc.paymentservice.entity;
+import com.abc.paymentservice.enums.PaymentMethod;
+import com.abc.paymentservice.enums.PaymentStatus;
 
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -26,13 +30,13 @@ public class Payment {
     private Long serviceRequestId;
 
     private Double amount;
+    @Enumerated(EnumType.STRING)
+    private PaymentMethod method;
 
-    private String method;
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus status;
 
-    private String status;
 }
-
-
 
 
 

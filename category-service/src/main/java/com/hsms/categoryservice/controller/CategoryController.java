@@ -5,59 +5,74 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.hsms.categoryservice.model.CategoryRequestDTO;
 import com.hsms.categoryservice.model.CategoryResponseDTO;
 import com.hsms.categoryservice.service.CategoryService;
 
+import jakarta.validation.Valid;
+
+@Valid
 @RestController
 @RequestMapping("/api/categories")
 public class CategoryController {
 
-	@Autowired
-	private CategoryService categoryService;
+    @Autowired
+    private CategoryService categoryService;
 
-	@PostMapping
-	public ResponseEntity<CategoryResponseDTO> addCategory(@RequestBody CategoryRequestDTO category) {
+    @PostMapping
+    public ResponseEntity<CategoryResponseDTO> addCategory(
+            @Valid @RequestBody CategoryRequestDTO category) {
 
-		CategoryResponseDTO response = categoryService.addCategory(category);
+        return new ResponseEntity<>(
+                categoryService.addCategory(category),
+                HttpStatus.CREATED);
+    }
 
-		return new ResponseEntity<>(response, HttpStatus.CREATED);
-	}
+    @GetMapping("/{categoryId}")
+    public ResponseEntity<CategoryResponseDTO> getCategoryById(
+            @PathVariable Long categoryId) {
 
-	@GetMapping("/{categoryId}")
-	public ResponseEntity<CategoryResponseDTO> getCategoryById(@PathVariable Long categoryId) {
+        return ResponseEntity.ok(
+                categoryService.findCategoryById(categoryId));
+    }
 
-		CategoryResponseDTO response = categoryService.findCategoryById(categoryId);
+    @GetMapping("/all")
+    public ResponseEntity<List<CategoryResponseDTO>> getAllCategories() {
 
-		return ResponseEntity.ok(response);
-	}
+        return ResponseEntity.ok(
+                categoryService.findAllCategories());
+    }
 
-	@GetMapping("/all")
-	public ResponseEntity<List<CategoryResponseDTO>> getAllCategories() {
+    @GetMapping("/active")
+    public ResponseEntity<List<CategoryResponseDTO>> getActiveCategories() {
 
-		return ResponseEntity.ok(categoryService.findAllCategories());
-	}
+        return ResponseEntity.ok(
+                categoryService.getActiveCategories());
+    }
 
-	@GetMapping("/active")
-	public ResponseEntity<List<CategoryResponseDTO>> getActiveCategories() {
+    @PutMapping("/{categoryId}")
+    public ResponseEntity<CategoryResponseDTO> updateCategory(
+            @PathVariable Long categoryId,
+            @Valid @RequestBody CategoryRequestDTO category) {
 
-		return ResponseEntity.ok(categoryService.getActiveCategories());
-	}
+        return ResponseEntity.ok(
+                categoryService.updateCategory(categoryId, category));
+    }
 
-	@PutMapping("/{categoryId}")
-	public ResponseEntity<CategoryResponseDTO> updateCategory(@PathVariable Long categoryId,
-			@RequestBody CategoryRequestDTO category) {
+    @DeleteMapping("/{categoryId}")
+    public ResponseEntity<String> deleteCategory(
+            @PathVariable Long categoryId) {
 
-		CategoryResponseDTO response = categoryService.updateCategory(categoryId, category);
-
-		return ResponseEntity.ok(response);
-	}
-
-	@DeleteMapping("/{categoryId}")
-	public ResponseEntity<String> deleteCategory(@PathVariable Long categoryId) {
-
-		return ResponseEntity.ok(categoryService.deleteCategory(categoryId));
-	}
+        return ResponseEntity.ok(
+                categoryService.deleteCategory(categoryId));
+    }
 }

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.abc.paymentservice.entity.Payment;
+import com.abc.paymentservice.enums.PaymentStatus;
 import com.abc.paymentservice.exception.ResourceNotFoundException;
 import com.abc.paymentservice.model.PaymentDetailResponseDTO;
 import com.abc.paymentservice.model.PaymentRequestDTO;
@@ -25,7 +26,7 @@ public class PaymentServiceImpl implements PaymentService {
 		payment.setMethod(paymentRequestDTO.getMethod());
 
 		// Default payment status
-		payment.setStatus("SUCCESS");
+		payment.setStatus(PaymentStatus.COMPLETED);
 
 		Payment savedPayment = paymentRepo.save(payment);
 
