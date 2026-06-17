@@ -15,7 +15,8 @@ public class TechnicianRegistrationDTO {
     private String email;
     private String password;
 
+    // additonal
     private String skill;
     private Integer experience;
-    private Boolean availabilityStatus;
+    private Boolean availabilityStatus; // Online or offilne
 }

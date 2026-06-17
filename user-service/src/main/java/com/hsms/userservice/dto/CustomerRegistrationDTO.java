@@ -15,6 +15,7 @@ public class CustomerRegistrationDTO {
 	private String email;
 	private String password;
 
+	//Addtional Data
 	private String address;
 	private String city;
 	private String pincode;
