@@ -2,7 +2,7 @@ package com.abc.paymentservice.exception;
 
 public class ResourceNotFoundException extends RuntimeException {
 
-    public ResourceNotFoundException(String message) {
-        super(message);
+    public ResourceNotFoundException(String msg) {
+        super(msg);
     }
 }
