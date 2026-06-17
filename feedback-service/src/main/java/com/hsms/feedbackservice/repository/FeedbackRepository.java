@@ -6,4 +6,6 @@ import com.hsms.feedbackservice.entity.Feedback;
 
 public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
 
+    boolean existsByServiceRequestId(Long serviceRequestId);
+
 }

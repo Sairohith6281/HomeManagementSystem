@@ -25,6 +25,16 @@ public class FeedbackServiceImpl implements FeedbackService {
     @Override
     public Feedback saveFeedback(Feedback feedback) {
 
+        // BUSINESS RULE:
+        // Only one feedback per service request
+
+        if (feedbackRepository.existsByServiceRequestId(
+                feedback.getServiceRequestId())) {
+
+            throw new RuntimeException(
+                    "Feedback already exists for this Service Request");
+        }
+
         Feedback savedFeedback = feedbackRepository.save(feedback);
 
         NotificationDTO notification = new NotificationDTO();
@@ -42,8 +52,8 @@ public class FeedbackServiceImpl implements FeedbackService {
             );
         } catch (Exception e) {
             System.out.println(
-                    "Notification Service failed: " + e.getMessage()
-            );
+                    "Notification Service failed: "
+                            + e.getMessage());
         }
 
         return savedFeedback;
@@ -56,23 +66,34 @@ public class FeedbackServiceImpl implements FeedbackService {
 
     @Override
     public Feedback getFeedbackById(Long id) {
+
         return feedbackRepository.findById(id)
                 .orElseThrow(() ->
-                        new RuntimeException("Feedback not found with id: " + id));
+                        new RuntimeException(
+                                "Feedback not found with id: " + id));
     }
 
     @Override
-    public Feedback updateFeedback(Long id, Feedback feedbackDetails) {
+    public Feedback updateFeedback(Long id,
+                                   Feedback feedbackDetails) {
 
-        Feedback existingFeedback = feedbackRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Feedback not found with id: " + id));
+        Feedback existingFeedback =
+                feedbackRepository.findById(id)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Feedback not found with id: " + id));
 
-        existingFeedback.setUserId(feedbackDetails.getUserId());
+        existingFeedback.setUserId(
+                feedbackDetails.getUserId());
+
         existingFeedback.setServiceRequestId(
                 feedbackDetails.getServiceRequestId());
-        existingFeedback.setRating(feedbackDetails.getRating());
-        existingFeedback.setComments(feedbackDetails.getComments());
+
+        existingFeedback.setRating(
+                feedbackDetails.getRating());
+
+        existingFeedback.setComments(
+                feedbackDetails.getComments());
 
         return feedbackRepository.save(existingFeedback);
     }
@@ -81,6 +102,7 @@ public class FeedbackServiceImpl implements FeedbackService {
     public void deleteFeedback(Long id) {
 
         if (!feedbackRepository.existsById(id)) {
+
             throw new RuntimeException(
                     "Feedback not found with id: " + id);
         }
