@@ -19,43 +19,25 @@ public class CategoryController {
 	private CategoryService categoryService;
 
 	@PostMapping
-	public ResponseEntity<?> addCategory(@RequestBody CategoryRequestDTO category) {
+	public ResponseEntity<CategoryResponseDTO> addCategory(@RequestBody CategoryRequestDTO category) {
 
-		try {
-			CategoryResponseDTO response = categoryService.addCategory(category);
-			return new ResponseEntity<>(response, HttpStatus.CREATED);
-		} catch (Exception e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		CategoryResponseDTO response = categoryService.addCategory(category);
+
+		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
 
 	@GetMapping("/{categoryId}")
-	public ResponseEntity<?> getCategoryById(@PathVariable Long categoryId) {
+	public ResponseEntity<CategoryResponseDTO> getCategoryById(@PathVariable Long categoryId) {
 
-		try {
-			CategoryResponseDTO response = categoryService.findCategoryById(categoryId);
+		CategoryResponseDTO response = categoryService.findCategoryById(categoryId);
 
-			return ResponseEntity.ok(response);
-
-		} catch (RuntimeException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-
-		} catch (Exception e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		return ResponseEntity.ok(response);
 	}
 
 	@GetMapping("/all")
-	public ResponseEntity<?> getAllCategories() {
+	public ResponseEntity<List<CategoryResponseDTO>> getAllCategories() {
 
-		try {
-			List<CategoryResponseDTO> categories = categoryService.findAllCategories();
-
-			return ResponseEntity.ok(categories);
-
-		} catch (Exception e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		return ResponseEntity.ok(categoryService.findAllCategories());
 	}
 
 	@GetMapping("/active")

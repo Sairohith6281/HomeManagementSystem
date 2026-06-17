@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import com.abc.paymentservice.model.PaymentDetailResponseDTO;
 import com.abc.paymentservice.model.PaymentRequestDTO;
 import com.abc.paymentservice.model.PaymentResponseDTO;
@@ -18,28 +17,18 @@ public class PaymentController {
 	private PaymentService paymentService;
 
 	@PostMapping
-	public ResponseEntity<?> makePayment(@RequestBody PaymentRequestDTO paymentRequestDTO) {
+	public ResponseEntity<PaymentResponseDTO> makePayment(@RequestBody PaymentRequestDTO paymentRequestDTO) {
 
-		try {
-			PaymentResponseDTO response = paymentService.makePayment(paymentRequestDTO);
+		PaymentResponseDTO response = paymentService.makePayment(paymentRequestDTO);
 
-			return new ResponseEntity<>(response, HttpStatus.CREATED);
-
-		} catch (Exception e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
 
 	@GetMapping("/{paymentId}")
-	public ResponseEntity<?> getPaymentById(@PathVariable Long paymentId) {
+	public ResponseEntity<PaymentDetailResponseDTO> getPaymentById(@PathVariable Long paymentId) {
 
-		try {
-			PaymentDetailResponseDTO response = paymentService.findPaymentById(paymentId);
+		PaymentDetailResponseDTO response = paymentService.findPaymentById(paymentId);
 
-			return ResponseEntity.ok(response);
-
-		} catch (Exception e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-		}
+		return ResponseEntity.ok(response);
 	}
 }
