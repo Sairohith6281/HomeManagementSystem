@@ -8,6 +8,7 @@ import com.hsms.entity.AssignmentStatus;
 
 public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
 
-	boolean existsByTechnicianIdAndStatusIn(Long technicianId, List<AssignmentStatus> of);
+	boolean existsByTechnicianIdAndStatusIn(Long technicianId, List<AssignmentStatus> status);
+	boolean existsByServiceRequestId(Long serviceRequestId);
 	
 }
