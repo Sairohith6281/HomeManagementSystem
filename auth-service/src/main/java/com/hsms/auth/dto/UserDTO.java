@@ -1,0 +1,21 @@
+package com.hsms.auth.dto;
+
+import com.hsms.auth.entity.User;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class UserDTO {
+    private Long id;
+    private String email;
+    private String firstName;
+    private String lastName;
+    private String phoneNumber;
+    private User.Role role;
+    private Boolean isActive;
+}
