@@ -2,7 +2,12 @@ package com.hsms.notificationservice.entity;
 
 import java.time.LocalDateTime;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "NOTIFICATION")
@@ -17,6 +22,9 @@ public class Notification {
     private String message;
 
     private String status;
+
+    // NEW FIELD
+    private String notificationType;
 
     private LocalDateTime notificationDate;
 
@@ -60,11 +68,29 @@ public class Notification {
         this.status = status;
     }
 
+    public String getNotificationType() {
+        return notificationType;
+    }
+
+    public void setNotificationType(String notificationType) {
+        this.notificationType = notificationType;
+    }
+
     public LocalDateTime getNotificationDate() {
         return notificationDate;
     }
 
     public void setNotificationDate(LocalDateTime notificationDate) {
         this.notificationDate = notificationDate;
+    }
+
+    @Override
+    public String toString() {
+        return "Notification [notificationId=" + notificationId
+                + ", userId=" + userId
+                + ", message=" + message
+                + ", status=" + status
+                + ", notificationType=" + notificationType
+                + ", notificationDate=" + notificationDate + "]";
     }
 }

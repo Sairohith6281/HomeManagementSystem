@@ -25,6 +25,7 @@ public class NotificationController {
         System.out.println("================================");
         System.out.println("Notification Received");
         System.out.println("User Id : " + notificationDTO.getUserId());
+        System.out.println("Type    : " + notificationDTO.getNotificationType());
         System.out.println("Message : " + notificationDTO.getMessage());
         System.out.println("Status  : " + notificationDTO.getStatus());
         System.out.println("================================");
@@ -32,6 +33,8 @@ public class NotificationController {
         Notification notification = new Notification();
 
         notification.setUserId(notificationDTO.getUserId());
+        notification.setNotificationType(
+                notificationDTO.getNotificationType());
         notification.setMessage(notificationDTO.getMessage());
         notification.setStatus(notificationDTO.getStatus());
 
@@ -56,6 +59,8 @@ public class NotificationController {
         Notification notification = new Notification();
 
         notification.setUserId(notificationDTO.getUserId());
+        notification.setNotificationType(
+                notificationDTO.getNotificationType());
         notification.setMessage(notificationDTO.getMessage());
         notification.setStatus(notificationDTO.getStatus());
 
