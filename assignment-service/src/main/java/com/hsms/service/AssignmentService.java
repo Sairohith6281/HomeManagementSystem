@@ -14,4 +14,5 @@ public interface AssignmentService {
     List<AssignmentResponseDTO> getAssignmentsByTechnician(Long technicianId);
     AssignmentResponseDTO updateAssignmentStatus(Long assignmentId, AssignmentStatus status);
     AssignmentResponseDTO reassignTechnician(Long assignmentId, Long technicianId);
+	void deleteAssignment(Long assignmentId);
 }
