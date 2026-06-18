@@ -108,9 +108,6 @@ public class AssignmentServiceImpl implements AssignmentService {
 
         assignment.setStatus(status);
         Assignment updated = assignmentRepository.save(assignment);
-
-        // ✅ Skip notification for now
-
         return modelMapper.map(updated, AssignmentResponseDTO.class);
     }
 
@@ -130,6 +127,13 @@ public class AssignmentServiceImpl implements AssignmentService {
         Assignment assignment = assignmentRepository.findById(assignmentId)
                 .orElseThrow(() -> new RuntimeException("Assignment not found"));
         assignmentRepository.delete(assignment);
+    }
+    
+    @Override
+    public AssignmentResponseDTO getByServiceRequestId(Long serviceRequestId) {
+        Assignment assignment = assignmentRepository.findByServiceRequestId(serviceRequestId)
+                .orElseThrow(() ->new RuntimeException("Assignment not found"));
+        return modelMapper.map(assignment, AssignmentResponseDTO.class);
     }
 
     private boolean currentUserHasRole(String role) {

@@ -54,4 +54,8 @@ public class AssignmentController {
 	    assignmentService.deleteAssignment(id);
 	    return ResponseEntity.noContent().build();
 	}
+	@GetMapping("/service-request/{serviceRequestId}")
+	public ResponseEntity<AssignmentResponseDTO> getByServiceRequestId(@PathVariable Long serviceRequestId) {
+	    return ResponseEntity.ok(assignmentService.getByServiceRequestId(serviceRequestId));
+	}
 }
