@@ -1,4 +1,4 @@
-package com.hsms.categoryservice.exception;
+package com.abc.paymentservice.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,5 +12,11 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<String> handleResourceNotFoundException(ResourceNotFoundException ex) {
 
 		return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+	}
+
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<String> handleException(Exception ex) {
+
+		return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 }

@@ -49,4 +49,13 @@ public class AssignmentController {
 			@RequestParam Long technicianId) {
 		return ResponseEntity.ok(assignmentService.reassignTechnician(id, technicianId));
 	}
+	@DeleteMapping("/delete/{id}")
+	public ResponseEntity<Void> deleteAssignment(@PathVariable Long id) {
+	    assignmentService.deleteAssignment(id);
+	    return ResponseEntity.noContent().build();
+	}
+	@GetMapping("/service-request/{serviceRequestId}")
+	public ResponseEntity<AssignmentResponseDTO> getByServiceRequestId(@PathVariable Long serviceRequestId) {
+	    return ResponseEntity.ok(assignmentService.getByServiceRequestId(serviceRequestId));
+	}
 }
