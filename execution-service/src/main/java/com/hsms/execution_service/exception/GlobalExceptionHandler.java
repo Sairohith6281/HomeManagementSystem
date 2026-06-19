@@ -15,6 +15,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 	}
 	
+	@ExceptionHandler(ResourceNotFoundException.class)
+	public ResponseEntity<String> handleResourceNotFoundException(Exception e) {
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+	}
+	
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> handleOtherException(Exception e) {
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
