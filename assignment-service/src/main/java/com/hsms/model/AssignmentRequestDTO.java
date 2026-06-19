@@ -1,5 +1,7 @@
 package com.hsms.model;
 
+import java.time.LocalDateTime;
+
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,4 +17,5 @@ public class AssignmentRequestDTO {
 
     @NotNull(message = "Service Request ID is required")
     private Long serviceRequestId;
+    private LocalDateTime startTime;
 }

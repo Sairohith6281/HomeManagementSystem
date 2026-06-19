@@ -1,5 +1,7 @@
 package com.hsms.model;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,4 +17,5 @@ public class TechnicianDetailResponseDTO {
     private Integer experience;
     private String availability;
     private Double rating;
+    private List<AssignmentResponseDTO> currentAssignments;
 }
