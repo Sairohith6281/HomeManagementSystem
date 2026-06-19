@@ -37,32 +37,34 @@ public class AssignmentServiceImpl implements AssignmentService {
 
 	@Override
 	public AssignmentResponseDTO assignTechnician(AssignmentRequestDTO requestDTO) {
-		
+
 		if (!currentUserHasRole("SERVICE_MANAGER")) {
 			throw new UnauthorizedActionException("Only SERVICE_MANAGER can assign technicians");
 		}
 		assignmentRepository.findByServiceRequestId(requestDTO.getServiceRequestId()).ifPresent(existing -> {
 			throw new DuplicateAssignmentException(
 					"An assignment already exists for service request id: " + requestDTO.getServiceRequestId());
-			});
+		});
 
-		
 		ResponseEntity<TechnicianDetailResponseDTO> response = userServiceClient
 				.getTechnicianById(requestDTO.getTechnicianId());
 		TechnicianDetailResponseDTO technician = response.getBody();
 
 		if (technician == null || !"Available".equalsIgnoreCase(technician.getAvailability())) {
-			throw new TechnicianNotAvailableException("Technician with id " + requestDTO.getTechnicianId() + " is not available");
+			throw new TechnicianNotAvailableException(
+					"Technician with id " + requestDTO.getTechnicianId() + " is not available");
 		}
 
-		
-		boolean hasActiveJob = assignmentRepository.existsByTechnicianIdAndStatusIn(requestDTO.getTechnicianId(),
-				List.of(AssignmentStatus.ASSIGNED, AssignmentStatus.ACCEPTED));
-		if (hasActiveJob) {
-			throw new TechnicianNotAvailableException("Technician already has active assignment");
+		List<Assignment> existingAssignments = assignmentRepository.findByTechnicianIdAndStatusIn(
+				requestDTO.getTechnicianId(), List.of(AssignmentStatus.ASSIGNED, AssignmentStatus.ACCEPTED));
+
+		boolean conflict = existingAssignments.stream()
+				.anyMatch(a -> a.getStartTime() != null && a.getStartTime().equals(requestDTO.getStartTime()));
+
+		if (conflict) {
+			throw new TechnicianNotAvailableException("Technician already has a job at this time");
 		}
 
-		
 		Assignment assignment = new Assignment();
 		assignment.setTechnicianId(requestDTO.getTechnicianId());
 		assignment.setServiceRequestId(requestDTO.getServiceRequestId());

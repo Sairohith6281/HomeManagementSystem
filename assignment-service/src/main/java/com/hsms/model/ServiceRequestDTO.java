@@ -10,11 +10,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ServiceRequestDTO {
-	 private Long requestId;
-	    private Long customerId;
-	    private Long categoryId;
-	    private String serviceType;
-	    private String status;
-	    private String address;
-	    private LocalDateTime scheduledTime;       
+	private Long requestId;
+	private Long customerId;
+	private Long categoryId;
+	private String serviceType;
+	private String status;
+	private String address;
+	private LocalDateTime scheduledTime;
 }

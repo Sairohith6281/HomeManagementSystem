@@ -36,4 +36,7 @@ public class Assignment {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AssignmentStatus status;
+    @Column(nullable = false)
+    private LocalDateTime startTime;
+
 }

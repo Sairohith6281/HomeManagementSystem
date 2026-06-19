@@ -34,14 +34,18 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
 	@Override
 	public DashboardResponseDTO getDashboard() {
-		int totalBookings = requestClient.getAllRequests().size();
-		double revenue = paymentClient.getTotalRevenue();
-		List<TechnicianDetailResponseDTO> topTechnicians = technicianClient.getTopTechnicians();
-		Map<Long, Integer> categoryDistribution = categoryClient.getCategoryDistribution();
+//		int totalBookings = requestClient.getAllRequests().size();
+//		double revenue = paymentClient.getTotalRevenue();
+//		List<TechnicianDetailResponseDTO> topTechnicians = technicianClient.getTopTechnicians();
+//		Map<Long, Integer> categoryDistribution = categoryClient.getCategoryDistribution();
+		int totalBookings = 25;
+		double revenue = 12000.50;
+		List<Long> topTechnicians = List.of(101L, 102L, 103L);
+		Map<Long, Integer> categoryDistribution = Map.of(1L, 10, 2L, 8, 3L, 7);
 		AnalyticsReport report = new AnalyticsReport();
 		report.setTotalBookings(totalBookings);
 		report.setRevenue(revenue);
-		report.setTopTechnicians(topTechnicians.stream().map(TechnicianDetailResponseDTO::getUserId).collect(Collectors.toList()));
+//		report.setTopTechnicians(topTechnicians.stream().map(TechnicianDetailResponseDTO::getUserId).collect(Collectors.toList()));
 		report.setCategoryDistribution(categoryDistribution);
 		report.setGeneratedAt(LocalDateTime.now());
 
