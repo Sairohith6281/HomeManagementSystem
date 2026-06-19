@@ -16,4 +16,6 @@ public interface AssignmentService {
     AssignmentResponseDTO reassignTechnician(Long assignmentId, Long technicianId);
 	void deleteAssignment(Long assignmentId);
 	AssignmentResponseDTO getByServiceRequestId(Long serviceRequestId);
+	AssignmentResponseDTO acceptJob(Long assignmentId);
+    AssignmentResponseDTO rejectJob(Long assignmentId);
 }

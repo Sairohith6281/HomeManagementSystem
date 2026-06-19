@@ -12,5 +12,5 @@ public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
 	boolean existsByTechnicianIdAndStatusIn(Long technicianId, List<AssignmentStatus> status);
 	boolean existsByServiceRequestId(Long serviceRequestId);
 	Optional<Assignment> findByServiceRequestId(Long serviceRequestId);
-	
+	 List<Assignment> findByTechnicianId(Long technicianId);
 }

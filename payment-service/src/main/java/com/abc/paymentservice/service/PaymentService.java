@@ -1,12 +1,28 @@
 package com.abc.paymentservice.service;
 
-import com.abc.paymentservice.model.PaymentDetailResponseDTO;
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import com.abc.paymentservice.enums.PaymentStatus;
 import com.abc.paymentservice.model.PaymentRequestDTO;
 import com.abc.paymentservice.model.PaymentResponseDTO;
 
 public interface PaymentService {
+	
+	
+	
+	PaymentResponseDTO createPayment( PaymentRequestDTO dto);
 
-    PaymentResponseDTO makePayment(PaymentRequestDTO paymentRequestDTO);
+	PaymentResponseDTO getPaymentById(Long paymentId);
 
-    PaymentDetailResponseDTO findPaymentById(Long paymentId);
+	Page<PaymentResponseDTO> getPaymentsByCustomer( Long customerId, Pageable pageable);
+
+	PaymentResponseDTO updatePaymentStatus(Long paymentId, PaymentStatus status);
+
+	List<PaymentResponseDTO> showAllPayments();
+
+	void deletePayment(Long paymentId);
+
 }

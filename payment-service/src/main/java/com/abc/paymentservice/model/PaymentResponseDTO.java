@@ -1,13 +1,28 @@
 package com.abc.paymentservice.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import java.time.LocalDateTime;
 
-@Getter
-@Setter
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class PaymentResponseDTO {
 
-    private Long paymentId;
-    private Long serviceRequestId;
-    private String status;
+	private Long paymentId;
+
+	private Long bookingId;
+
+	private Long customerId;
+
+	private Double amount;
+
+	private String paymentMethod;
+
+	private String status;
+
+	private LocalDateTime paymentDate;
+
 }
