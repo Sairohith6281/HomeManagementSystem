@@ -7,7 +7,7 @@ import com.hsms.analytics_service.model.TechnicianDetailResponseDTO;
 
 @FeignClient(name = "technician-service")
 public interface TechnicianClient {
-	
-    @GetMapping("/api/technicians/top")
-    List<TechnicianDetailResponseDTO> getTopTechnicians();
+
+    @GetMapping("/api/technicians")
+    List<TechnicianDetailResponseDTO> getAllTechnicians();
 }

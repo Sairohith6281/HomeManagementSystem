@@ -1,5 +1,8 @@
 package com.hsms.execution_service.model;
 
+import com.hsms.execution_service.entity.PaymentMethod;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,5 +15,6 @@ import lombok.Setter;
 public class PaymentRequestDTO {
     private Long serviceRequestId;
     private Double amount;
-    private String method; // e.g., ONLINE, CASH
+    @Schema(description = "Payment method", allowableValues = {"ONLINE", "CASH", "CARD", "UPI"})
+    private PaymentMethod paymentMethod;
 }

@@ -1,12 +1,13 @@
 package com.hsms.analytics_service.feignclient;
 
-import java.util.Map;
+import java.util.List;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import com.hsms.analytics_service.model.CategoryDistributionDTO;
 
 @FeignClient(name = "category-service")
 public interface CategoryClient {
 	
     @GetMapping("/api/categories/distribution")
-    Map<Long, Integer> getCategoryDistribution();
+    List<CategoryDistributionDTO> getCategoryDistribution();
 }

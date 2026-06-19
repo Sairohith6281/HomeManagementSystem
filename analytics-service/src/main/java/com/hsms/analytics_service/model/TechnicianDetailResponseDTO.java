@@ -10,11 +10,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TechnicianDetailResponseDTO {
-    private Long userId;
-    private String name;
-    private String email;
-    private String skill;
-    private Integer experience;
-    private Boolean availability;
-    private Double rating;
+	private Long technicianId;
+	private String technicianName;
+	private Long completedJobs;
+	private Double rating;
 }

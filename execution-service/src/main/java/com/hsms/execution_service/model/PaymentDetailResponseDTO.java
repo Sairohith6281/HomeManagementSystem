@@ -1,5 +1,9 @@
 package com.hsms.execution_service.model;
 
+import java.time.LocalDateTime;
+
+import com.hsms.execution_service.entity.PaymentMethod;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,6 +17,7 @@ public class PaymentDetailResponseDTO {
     private Long paymentId;
     private Long serviceRequestId;
     private Double amount;
-    private String method;
+    private PaymentMethod method;
     private String status;
+    private LocalDateTime createdAt;
 }

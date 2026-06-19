@@ -17,5 +17,7 @@ public class AssignmentRequestDTO {
 
     @NotNull(message = "Service Request ID is required")
     private Long serviceRequestId;
+    @NotNull(message = "Service Request ID is required")
     private LocalDateTime startTime;
+    private Long userId;   
 }

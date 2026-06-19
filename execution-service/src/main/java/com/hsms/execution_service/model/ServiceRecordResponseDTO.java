@@ -1,5 +1,7 @@
 package com.hsms.execution_service.model;
 
+import java.time.LocalDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,5 +15,6 @@ import lombok.Setter;
 public class ServiceRecordResponseDTO {
     private Long recordId;
     private Long serviceRequestId;
+    private LocalDateTime startTime;
     private String status;
 } 
