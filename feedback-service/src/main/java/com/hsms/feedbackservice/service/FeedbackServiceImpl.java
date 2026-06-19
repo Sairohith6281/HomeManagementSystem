@@ -40,8 +40,9 @@ public class FeedbackServiceImpl implements FeedbackService {
         NotificationDTO notification = new NotificationDTO();
         notification.setUserId(savedFeedback.getUserId());
         notification.setMessage(
-                "Thank you for your feedback. Your rating: "
+                "Thanks For the feedback. Your rating: "
                         + savedFeedback.getRating());
+        notification.setNotificationType("FEEDBACK");
         notification.setStatus("SENT");
 
         try {

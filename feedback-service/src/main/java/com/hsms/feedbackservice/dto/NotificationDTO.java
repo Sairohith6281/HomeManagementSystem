@@ -5,6 +5,7 @@ public class NotificationDTO {
     private Long userId;
     private String message;
     private String status;
+    private String notificationType;
 
     public NotificationDTO() {
     }
@@ -31,5 +32,12 @@ public class NotificationDTO {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+    public String getNotificationType() {
+        return notificationType;
+    }
+
+    public void setNotificationType(String notificationType) {
+        this.notificationType = notificationType;
     }
 }
