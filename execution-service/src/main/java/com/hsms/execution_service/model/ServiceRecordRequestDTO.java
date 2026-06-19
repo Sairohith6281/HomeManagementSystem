@@ -15,4 +15,5 @@ public class ServiceRecordRequestDTO {
     private String endTime;
     private String remarks;
     private Double actualCost;
+//    private PaymentMethod paymentmethod;
 }

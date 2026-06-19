@@ -15,5 +15,5 @@ public class AssignmentDetailResponseDTO {
     private Long serviceRequestId;
     private LocalDateTime assignedDate;
     private AssignmentStatus status;
-    private TechnicianDTO technician; 
+    private TechnicianDetailResponseDTO technician; 
 }
