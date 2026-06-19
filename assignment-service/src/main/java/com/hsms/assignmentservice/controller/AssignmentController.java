@@ -16,46 +16,57 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AssignmentController {
 
-	private final AssignmentService assignmentService;
+    private final AssignmentService assignmentService;
 
-	@PostMapping
-	public ResponseEntity<AssignmentResponseDTO> assignTechnician(@RequestBody AssignmentRequestDTO requestDTO) {
-		return ResponseEntity.ok(assignmentService.assignTechnician(requestDTO));
-	}
-	
-	@GetMapping("/{id}")
-	public ResponseEntity<AssignmentDetailResponseDTO> getAssignmentById(@PathVariable Long id) {
-		return ResponseEntity.ok(assignmentService.getAssignmentById(id));
-	}
+    @PostMapping
+    public ResponseEntity<AssignmentResponseDTO> assignTechnician(@RequestBody AssignmentRequestDTO requestDTO) {
+        return ResponseEntity.ok(assignmentService.assignTechnician(requestDTO));
+    }
 
-	@GetMapping
-	public ResponseEntity<List<AssignmentDetailResponseDTO>> getAllAssignments() {
-		return ResponseEntity.ok(assignmentService.getAllAssignments());
-	}
+    @GetMapping("/{id}")
+    public ResponseEntity<AssignmentDetailResponseDTO> getAssignmentById(@PathVariable Long id) {
+        return ResponseEntity.ok(assignmentService.getAssignmentById(id));
+    }
 
-	@GetMapping("/technician/{technicianId}")
-	public ResponseEntity<List<AssignmentResponseDTO>> getAssignmentsByTechnician(@PathVariable Long technicianId) {
-		return ResponseEntity.ok(assignmentService.getAssignmentsByTechnician(technicianId));
-	}
+    @GetMapping
+    public ResponseEntity<List<AssignmentDetailResponseDTO>> getAllAssignments() {
+        return ResponseEntity.ok(assignmentService.getAllAssignments());
+    }
 
-	@PutMapping("/{id}/status")
-	public ResponseEntity<AssignmentResponseDTO> updateAssignmentStatus(@PathVariable Long id,
-			@RequestParam AssignmentStatus status) {
-		return ResponseEntity.ok(assignmentService.updateAssignmentStatus(id, status));
-	}
+    @GetMapping("/technician/{technicianId}")
+    public ResponseEntity<List<AssignmentResponseDTO>> getAssignmentsByTechnician(@PathVariable Long technicianId) {
+        return ResponseEntity.ok(assignmentService.getAssignmentsByTechnician(technicianId));
+    }
 
-	@PutMapping("/{id}/reassign")
-	public ResponseEntity<AssignmentResponseDTO> reassignTechnician(@PathVariable Long id,
-			@RequestParam Long technicianId) {
-		return ResponseEntity.ok(assignmentService.reassignTechnician(id, technicianId));
-	}
-	@DeleteMapping("/delete/{id}")
-	public ResponseEntity<Void> deleteAssignment(@PathVariable Long id) {
-	    assignmentService.deleteAssignment(id);
-	    return ResponseEntity.noContent().build();
-	}
-	@GetMapping("/service-request/{serviceRequestId}")
-	public ResponseEntity<AssignmentResponseDTO> getByServiceRequestId(@PathVariable Long serviceRequestId) {
-	    return ResponseEntity.ok(assignmentService.getByServiceRequestId(serviceRequestId));
-	}
+    @PutMapping("/{id}/status")
+    public ResponseEntity<AssignmentResponseDTO> updateAssignmentStatus(@PathVariable Long id,
+                                                                        @RequestParam AssignmentStatus status) {
+        return ResponseEntity.ok(assignmentService.updateAssignmentStatus(id, status));
+    }
+
+    @PutMapping("/{id}/reassign")
+    public ResponseEntity<AssignmentResponseDTO> reassignTechnician(@PathVariable Long id, @RequestParam Long technicianId) {
+        return ResponseEntity.ok(assignmentService.reassignTechnician(id, technicianId));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteAssignment(@PathVariable Long id) {
+        assignmentService.deleteAssignment(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/service-request/{serviceRequestId}")
+    public ResponseEntity<AssignmentResponseDTO> getByServiceRequestId(@PathVariable Long serviceRequestId) {
+        return ResponseEntity.ok(assignmentService.getByServiceRequestId(serviceRequestId));
+    }
+
+    @PutMapping("/{id}/accept")
+    public ResponseEntity<AssignmentResponseDTO> acceptJob(@PathVariable Long id) {
+        return ResponseEntity.ok(assignmentService.acceptJob(id));
+    }
+
+    @PutMapping("/{id}/reject")
+    public ResponseEntity<AssignmentResponseDTO> rejectJob(@PathVariable Long id) {
+        return ResponseEntity.ok(assignmentService.rejectJob(id));
+    }
 }
