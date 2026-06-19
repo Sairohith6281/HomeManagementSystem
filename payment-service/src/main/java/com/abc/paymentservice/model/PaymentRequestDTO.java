@@ -1,13 +1,26 @@
 package com.abc.paymentservice.model;
 
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter
-@Setter
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+
+
 public class PaymentRequestDTO {
+	
+	
+	private Long serviceRequestId;
 
-    private Long serviceRequestId;
-    private Double amount;
-    private String method;
+	private Long customerId;
+
+	private Double amount;
+
+	private String paymentMethod;
+
+    
 }

@@ -9,4 +9,8 @@ import com.hsms.categoryservice.entity.ServiceCategory;
 public interface CategoryRepository extends JpaRepository<ServiceCategory, Long>{
 	
 	List<ServiceCategory> findByActiveTrue(); // this generates: select * from category_tbl where active = true;
+	
+	boolean existsByCategoryName(String categoryName);
+
+
 }

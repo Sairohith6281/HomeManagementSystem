@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.hsms.categoryservice.entity.ServiceCategory;
+import com.hsms.categoryservice.exception.DuplicateCategoryException;
 import com.hsms.categoryservice.exception.ResourceNotFoundException;
 import com.hsms.categoryservice.model.CategoryRequestDTO;
 import com.hsms.categoryservice.model.CategoryResponseDTO;
@@ -19,6 +20,13 @@ public class CategoryServiceImpl implements CategoryService {
 
 	@Override
 	public CategoryResponseDTO addCategory(CategoryRequestDTO category) {
+		 if(categoryRepo.existsByCategoryName(
+		            category.getCategoryName())) {
+
+		        throw new DuplicateCategoryException(
+		                "Category already exists with name : "
+		                        + category.getCategoryName());
+		    }
 		ServiceCategory serviceCategory = new ServiceCategory();
 
 	    serviceCategory.setCategoryName(category.getCategoryName());
