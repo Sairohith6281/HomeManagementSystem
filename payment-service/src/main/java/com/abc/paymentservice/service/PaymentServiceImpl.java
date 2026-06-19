@@ -38,7 +38,8 @@ public class PaymentServiceImpl implements PaymentService {
 	@Override
 	@CircuitBreaker(name = "paymentService", fallbackMethod = "createPaymentFallback")
 	public PaymentResponseDTO createPayment(PaymentRequestDTO dto) {
-
+      
+		
 		// Validate Booking
 		BookingResponseDTO booking = bookingFeignClient.getBookingById(dto.getServiceRequestId());
 

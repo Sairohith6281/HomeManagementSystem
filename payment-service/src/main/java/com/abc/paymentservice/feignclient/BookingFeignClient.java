@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import com.abc.paymentservice.model.BookingResponseDTO;
 
-@FeignClient(name="SERVIEC-REQUEST-SERVICE")
+@FeignClient(name="SERVICE-REQUEST-SERVICE")
 public interface BookingFeignClient {
 	
 	

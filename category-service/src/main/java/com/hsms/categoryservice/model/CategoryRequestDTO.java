@@ -22,7 +22,7 @@ public class CategoryRequestDTO {
     private String description;
 
     @NotNull(message = "Base price is required")
-    @DecimalMin(value = "500.0", inclusive = false,
-                message = "Base price must be greater than 500")
+    @DecimalMin(value = "0.0", inclusive = false,
+                message = "Base price must be greater than 0")
     private Double basePrice;
 }
