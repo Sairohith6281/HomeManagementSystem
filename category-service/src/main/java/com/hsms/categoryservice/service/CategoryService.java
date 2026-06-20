@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.hsms.categoryservice.model.CategoryRequestDTO;
 import com.hsms.categoryservice.model.CategoryResponseDTO;
+import com.hsms.categoryservice.model.CategoryStatusDTO;
 
 public interface CategoryService {
 
@@ -19,4 +20,8 @@ public interface CategoryService {
             CategoryRequestDTO category);
 
     String deleteCategory(Long categoryId);
+
+    CategoryResponseDTO updateCategoryStatus(
+            Long categoryId,
+            CategoryStatusDTO statusDTO);
 }

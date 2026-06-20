@@ -25,4 +25,7 @@ public class CategoryRequestDTO {
     @DecimalMin(value = "0.0", inclusive = false,
                 message = "Base price must be greater than 0")
     private Double basePrice;
+
+	private Boolean active;
+		
 }

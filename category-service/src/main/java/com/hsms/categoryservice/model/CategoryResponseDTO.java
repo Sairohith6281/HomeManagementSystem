@@ -10,5 +10,6 @@ public class CategoryResponseDTO {
     private String categoryName;
     private String description;
     private Double basePrice;
+    private Boolean active;
 
 }

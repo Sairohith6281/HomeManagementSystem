@@ -39,5 +39,5 @@ public class ServiceCategory {
     private Double basePrice;
 
     @Column(nullable = false)
-    private Boolean active = true;
+    private Boolean active;
 }
