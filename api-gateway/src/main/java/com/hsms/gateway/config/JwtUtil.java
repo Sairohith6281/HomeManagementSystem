@@ -14,91 +14,46 @@ import io.jsonwebtoken.security.Keys;
 @Component
 public class JwtUtil {
 
-    private static final String SECRET =
-            "VGhpc0lzTXlTZWNyZXRLZXlGb3JKV1RUb2tlbjEyMzQ1Njc4OTA=";
+	private static final String SECRET = "VGhpc0lzTXlTZWNyZXRLZXlGb3JKV1RUb2tlbjEyMzQ1Njc4OTA=";
 
-    private SecretKey getSignKey() {
+	private SecretKey getSignKey() {
 
-        byte[] keyBytes =
-                Decoders.BASE64.decode(SECRET);
+		byte[] keyBytes = Decoders.BASE64.decode(SECRET);
 
-        return Keys.hmacShaKeyFor(keyBytes);
-    }
+		return Keys.hmacShaKeyFor(keyBytes);
+	}
 
-//    public boolean validateToken(String token) {
-//
-//        Jwts.parserBuilder()
-//            .setSigningKey(getSignKey())
-//            .build()
-//            .parseClaimsJws(token);
-//
-//        return true;
-//    }
-//    public String extractUsername(String token) {
-//        return Jwts.parser()
-//                .verifyWith((SecretKey) getSignKey())
-//                .build()
-//                .parseSignedClaims(token)
-//                .getPayload()
-//                .getSubject();
-//    }
-//
-//    public String extractRole(String token) {
-//        return Jwts.parser()
-//                .verifyWith((SecretKey) getSignKey())
-//                .build()
-//                .parseSignedClaims(token)
-//                .getPayload()
-//                .get("role", String.class);
-//    }
-    
-    
-    public boolean validateToken(String token) {
+	public boolean validateToken(String token) {
 
-    	System.out.println(token);
-        Jwts.parser()
-                .verifyWith((SecretKey) getSignKey())
-                .build()
-                .parseSignedClaims(token);
+		System.out.println(token);
+		Jwts.parser().verifyWith((SecretKey) getSignKey()).build().parseSignedClaims(token);
 
-        return true;
-    }
+		return true;
+	}
 
-    public String extractUsername(String token) {
+	public String extractUsername(String token) {
 
-        return Jwts.parser()
-                .verifyWith((SecretKey) getSignKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .getSubject();
-    }
+		return Jwts.parser().verifyWith((SecretKey) getSignKey()).build().parseSignedClaims(token).getPayload()
+				.getSubject();
+	}
 
-    public String extractRole(String token) {
+	public String extractRole(String token) {
 
-        return Jwts.parser()
-                .verifyWith((SecretKey) getSignKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .get("role", String.class);
-    }
+		return Jwts.parser().verifyWith((SecretKey) getSignKey()).build().parseSignedClaims(token).getPayload()
+				.get("role", String.class);
+	}
 
-    public Long extractUserId(String token) {
+	public Long extractUserId(String token) {
 
-        Claims claims =
-                Jwts.parser()
-                        .verifyWith((SecretKey) getSignKey())
-                        .build()
-                        .parseSignedClaims(token)
-                        .getPayload();
+		Claims claims = Jwts.parser().verifyWith((SecretKey) getSignKey()).build().parseSignedClaims(token)
+				.getPayload();
 
-        Object userId = claims.get("userId");
+		Object userId = claims.get("userId");
 
-        if (userId instanceof Integer) {
-            return ((Integer) userId).longValue();
-        }
+		if (userId instanceof Integer) {
+			return ((Integer) userId).longValue();
+		}
 
-        return (Long) userId;
-    }
+		return (Long) userId;
+	}
 }

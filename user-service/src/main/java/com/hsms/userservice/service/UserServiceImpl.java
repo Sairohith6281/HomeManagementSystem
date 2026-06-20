@@ -36,29 +36,6 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private ModelMapper modelMapper;
 
-//    @Override
-//    public CustomerDetailResponseDTO createCustomer(
-//            CustomerProfileRequestDTO dto) {
-//
-//        UserProfileResponseDTO user =
-//                authFeignClient.getUserById(dto.getUserId());
-//
-//        Customer customer =
-//                modelMapper.map(dto, Customer.class);
-//
-//        Customer saved =
-//                customerRepository.save(customer);
-//
-//        CustomerDetailResponseDTO response =
-//                modelMapper.map(saved,
-//                        CustomerDetailResponseDTO.class);
-//
-//        response.setUserId(user.getUserId());
-//        response.setName(user.getName());
-//        response.setEmail(user.getEmail());
-//
-//        return response;
-//    }
 
     @Override
     public CustomerDetailResponseDTO updateCustomer(

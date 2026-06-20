@@ -29,31 +29,6 @@ public class CustomerController {
 	@Autowired
 	private UserService service;
 
-//    @PostMapping
-//    public ResponseEntity<CustomerDetailResponseDTO> createCustomer(
-//            @RequestBody CustomerProfileRequestDTO dto) {
-//
-//        return new ResponseEntity<>(
-//                service.createCustomer(dto),
-//                HttpStatus.CREATED);
-//    }
-
-	//
-	/*
-	 * @PostMapping public ResponseEntity<CustomerDetailResponseDTO> createCustomer(
-	 * 
-	 * @RequestHeader("X-User-Id") Long userId,
-	 * 
-	 * @RequestHeader("X-User-Email") String email,
-	 * 
-	 * @RequestBody CustomerProfileRequestDTO dto) {
-	 * 
-	 * return new ResponseEntity<>(
-	 * 
-	 * service.createCustomer( dto, userId, email),
-	 * 
-	 * HttpStatus.CREATED); }
-	 */
 	@PreAuthorize("hasAnyRole('CUSTOMER','ADMIN')")
 	@PostMapping
 	public ResponseEntity<CustomerDetailResponseDTO> createCustomer(

@@ -1,33 +1,44 @@
 package com.hsms.booking.entity;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import com.hsms.booking.enums.ServiceRequestStatus;
-import jakarta.persistence.*;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.LocalDateTime;
-
-/**
- * ServiceRequest Entity - Represents customer service requests
- */
 @Entity
-@Table(name = "service_requests", indexes = {
-    @Index(name = "idx_customer_id", columnList = "customer_id"),
-    @Index(name = "idx_category_id", columnList = "category_id"),
-    @Index(name = "idx_status", columnList = "status"),
-    @Index(name = "idx_scheduled_date_time", columnList = "scheduled_date_time"),
-    @Index(name = "idx_created_at", columnList = "created_at"),
-    @Index(name = "idx_city", columnList = "city"),
-    @Index(name = "idx_pincode", columnList = "pincode"),
-    @Index(name = "idx_status_created_at", columnList = "status,created_at"),
-    @Index(name = "idx_customer_status", columnList = "customer_id,status"),
-    @Index(name = "idx_category_status", columnList = "category_id,status"),
-    @Index(name = "idx_technician_status", columnList = "technician_id,status")
-})
+@Table(
+    name = "SERVICE_REQUESTS",
+    indexes = {
+        @Index(name = "IDX_CUSTOMER_ID", columnList = "CUSTOMER_ID"),
+        @Index(name = "IDX_CATEGORY_ID", columnList = "CATEGORY_ID"),
+        @Index(name = "IDX_STATUS", columnList = "STATUS"),
+        @Index(name = "IDX_SCHEDULED_DATE_TIME", columnList = "SCHEDULED_DATE_TIME"),
+        @Index(name = "IDX_CREATED_AT", columnList = "CREATED_AT"),
+        @Index(name = "IDX_CITY", columnList = "CITY"),
+        @Index(name = "IDX_PINCODE", columnList = "PINCODE"),
+        @Index(name = "IDX_STATUS_CREATED_AT", columnList = "STATUS,CREATED_AT"),
+        @Index(name = "IDX_CUSTOMER_STATUS", columnList = "CUSTOMER_ID,STATUS"),
+        @Index(name = "IDX_CATEGORY_STATUS", columnList = "CATEGORY_ID,STATUS"),
+        @Index(name = "IDX_TECHNICIAN_STATUS", columnList = "TECHNICIAN_ID,STATUS")
+    }
+)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -35,48 +46,52 @@ import java.time.LocalDateTime;
 public class ServiceRequest {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "request_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "service_request_seq")
+    @SequenceGenerator(
+        name = "service_request_seq",
+        sequenceName = "SERVICE_REQUEST_SEQ",
+        allocationSize = 1
+    )
+    @Column(name = "REQUEST_ID")
     private Long requestId;
 
-    @Column(name = "customer_id", nullable = false)
+    @Column(name = "CUSTOMER_ID", nullable = false)
     private Long customerId;
 
-    @Column(name = "category_id", nullable = false)
+    @Column(name = "CATEGORY_ID", nullable = false)
     private Long categoryId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, length = 20)
+    @Column(name = "STATUS", nullable = false, length = 20)
     @Builder.Default
     private ServiceRequestStatus status = ServiceRequestStatus.CREATED;
 
-    @Column(name = "address", nullable = false, length = 255)
+    @Column(name = "ADDRESS", nullable = false, length = 255)
     private String address;
 
-    @Column(name = "city", length = 100)
+    @Column(name = "CITY", length = 100)
     private String city;
 
-    @Column(name = "pincode", length = 10)
+    @Column(name = "PINCODE", length = 10)
     private String pincode;
 
-    @Column(name = "scheduled_date_time", nullable = false)
+    @Column(name = "SCHEDULED_DATE_TIME", nullable = false)
     private LocalDateTime scheduledDateTime;
 
-    @Column(name = "description", columnDefinition = "TEXT")
+    @Column(name = "DESCRIPTION", length = 1000)
     private String description;
 
-    @Column(name = "priority", length = 20)
+    @Column(name = "PRIORITY", length = 20)
     private String priority;
 
-    @Column(name = "technician_id")
+    @Column(name = "TECHNICIAN_ID")
     private Long technicianId;
 
     @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(name = "CREATED_AT", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
+    @Column(name = "UPDATED_AT")
     private LocalDateTime updatedAt;
 }
-

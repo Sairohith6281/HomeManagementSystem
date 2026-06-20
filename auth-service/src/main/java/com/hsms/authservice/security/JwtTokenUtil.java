@@ -18,66 +18,46 @@ import io.jsonwebtoken.security.Keys;
 @Component
 public class JwtTokenUtil {
 
-    @Value("${app.jwt-secret}")
-    private String jwtSecret;
+	@Value("${app.jwt-secret}")
+	private String jwtSecret;
 
-    @Value("${app.jwt-expiration-milliseconds}")
-    private long jwtExpirationDate;
+	@Value("${app.jwt-expiration-milliseconds}")
+	private long jwtExpirationDate;
 
-//    public String generateToken(User user) {
-//
-//        Date currentDate = new Date();
-//        Date expireDate = new Date(currentDate.getTime() + jwtExpirationDate);
-//
-//        return Jwts.builder().subject(user.getEmail())
-//
-//                .claim("userId", user.getId())
-//                .claim("role", user.getRoles())
-//
-//                .issuedAt(currentDate)
-//                .expiration(expireDate)
-//
-//                .signWith(key())
-//                .compact();
-//    }
-    
-    public String generateToken(User user) {
+	public String generateToken(User user) {
 
-        String role = user.getRoles()
-                .iterator()
-                .next()
-                .getRoleName();
+		String role = user.getRoles().iterator().next().getRoleName();
 
-        return Jwts.builder()
-                .subject(user.getEmail())
-                .claim("userId", user.getUserId())
-                .claim("role", role)
-                .issuedAt(new Date())
-                .expiration(
-                        new Date(System.currentTimeMillis()
-                                + 86400000))
-                .signWith(key())
-                .compact();
-    }
-    
-   
-
+		return Jwts.builder().subject(user.getEmail()).claim("userId", user.getUserId()).claim("role", role)
+				.issuedAt(new Date()).expiration(new Date(System.currentTimeMillis() + 86400000)).signWith(key())
+				.compact();
+	}
 
 	private Key key() {
 
-        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
-    }
+		return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
+	}
 
-    public boolean validateToken(String token) {
+	public boolean validateToken(String token) {
 
-        Jwts.parser().verifyWith((SecretKey) key()).build().parse(token);
-        return true;
-    }
+		Jwts.parser().verifyWith((SecretKey) key()).build().parse(token);
+		return true;
+	}
 
-    public String getUsername(String token) {
+	public String getUsername(String token) {
 
-        return Jwts.parser().verifyWith((SecretKey) key()).build().parseSignedClaims(token)
-                .getPayload()
-                .getSubject();
-    }
+		return Jwts.parser().verifyWith((SecretKey) key()).build().parseSignedClaims(token).getPayload().getSubject();
+	}
+
+	public Long getUserId(String token) {
+
+		return Jwts.parser().verifyWith((SecretKey) key()).build().parseSignedClaims(token).getPayload().get("userId",
+				Long.class);
+	}
+
+	public String getRole(String token) {
+
+		return Jwts.parser().verifyWith((SecretKey) key()).build().parseSignedClaims(token).getPayload().get("role",
+				String.class);
+	}
 }

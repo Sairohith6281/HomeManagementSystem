@@ -70,7 +70,6 @@ implements AuthService {
         response.setUserId(saved.getUserId());
         response.setMessage("Registration Successful");
         response.setMessage("Hello " + saved.getFirstName());
-        response.setMessage("roles:" + saved.getRoles());
         return response;
     }
 

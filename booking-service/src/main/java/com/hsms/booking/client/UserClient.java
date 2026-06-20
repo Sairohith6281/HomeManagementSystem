@@ -7,12 +7,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 /**
  * Feign client for User Service
  */
-@FeignClient(name = "user-service")
+@FeignClient(name = "user-service", contextId = "userClient")
 public interface UserClient {
-    
-    @GetMapping("/api/users/customers/{id}")
-    CustomerDTO getCustomerById(@PathVariable("id") Long id);
-    
-    @GetMapping("/api/users/customers/{id}/exists")
-    Boolean customerExists(@PathVariable("id") Long id);
+
+    @GetMapping("/api/users/api/customers/customerId/{customerId}")
+    CustomerDTO getCustomerById(@PathVariable Long customerId);
 }
