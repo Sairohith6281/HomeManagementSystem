@@ -12,10 +12,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ServiceRecordRequestDTO {
-    private Long serviceRequestId;
-    private String remarks;
-    private Double actualCost;
-    
-    @Schema(description = "Payment method", allowableValues = {"ONLINE", "CASH", "CARD", "UPI"})
-    private PaymentMethod paymentMethod;
+	private Long serviceRequestId;
+	private String remarks;
+	private Double actualCost;
+
+	@Schema(description = "Payment method", allowableValues = { "ONLINE", "CASH", "CARD", "UPI" })
+	private PaymentMethod paymentMethod;
+
+	private String Status;
 }

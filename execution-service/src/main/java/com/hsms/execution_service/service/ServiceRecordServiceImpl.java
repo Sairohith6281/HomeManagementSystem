@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 import com.hsms.execution_service.entity.ServiceRecord;
 import com.hsms.execution_service.exception.ResourceNotFoundException;
 import com.hsms.execution_service.feignclient.AssignmentClient;
+import com.hsms.execution_service.feignclient.BookingserviceClient;
 import com.hsms.execution_service.feignclient.PaymentClient;
-import com.hsms.execution_service.feignclient.ServiceRequestClient;
 import com.hsms.execution_service.model.AssignmentResponseDTO;
 import com.hsms.execution_service.model.PaymentRequestDTO;
 import com.hsms.execution_service.model.PaymentResponseDTO;
@@ -24,18 +24,20 @@ import lombok.RequiredArgsConstructor;
 public class ServiceRecordServiceImpl implements ServiceRecordService {
 
     private final ServiceRecordRepository repo;
-    private final ServiceRequestClient requestClient;
+    private final BookingserviceClient requestClient;
     private final PaymentClient paymentClient;
     private final AssignmentClient assignmentClient;
     private final ModelMapper mapper;
 
     @Override
     public ServiceRecordResponseDTO start(ServiceRecordRequestDTO dto) {
-        ServiceRecordRequestDTO serviceRequest = requestClient.getRequest(dto.getServiceRequestId());
-        if (serviceRequest == null) {
-            throw new ResourceNotFoundException("Service request not found");
+        // Validate service request
+        var sr = requestClient.getRequest(dto.getServiceRequestId());
+        if (sr == null || !"ASSIGNED".equalsIgnoreCase(sr.getStatus())) {
+            throw new IllegalStateException("Only ASSIGNED requests can be started");
         }
 
+        // Validate assignment
         AssignmentResponseDTO assignment = assignmentClient.getByServiceRequestId(dto.getServiceRequestId());
         if (assignment == null || !"ACCEPTED".equalsIgnoreCase(assignment.getStatus())) {
             throw new IllegalStateException("Only ACCEPTED assignments can be started");
@@ -47,6 +49,10 @@ public class ServiceRecordServiceImpl implements ServiceRecordService {
         record.setStatus("IN_PROGRESS");
 
         ServiceRecord saved = repo.save(record);
+
+        // Update Booking Service status
+        requestClient.updateStatus(dto.getServiceRequestId(), "IN_PROGRESS");
+
         return mapper.map(saved, ServiceRecordResponseDTO.class);
     }
 
@@ -66,12 +72,17 @@ public class ServiceRecordServiceImpl implements ServiceRecordService {
 
         ServiceRecord saved = repo.save(record);
 
+        // Trigger payment
         PaymentRequestDTO payment = new PaymentRequestDTO();
         payment.setServiceRequestId(record.getServiceRequestId());
         payment.setAmount(record.getActualCost());
-        payment.setPaymentMethod(dto.getPaymentMethod()); // enum directly
+        payment.setPaymentMethod(dto.getPaymentMethod());
 
         PaymentResponseDTO paymentResponse = paymentClient.createPayment(payment);
+
+        // Update Booking Service status
+        requestClient.updateStatus(record.getServiceRequestId(), "COMPLETED");
+
         return mapper.map(saved, ServiceRecordDetailResponseDTO.class);
     }
 

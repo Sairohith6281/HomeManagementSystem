@@ -1,8 +1,8 @@
 package com.hsms.service;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -14,8 +14,8 @@ import com.hsms.exception.AssignmentNotFoundException;
 import com.hsms.exception.DuplicateAssignmentException;
 import com.hsms.exception.TechnicianNotAvailableException;
 import com.hsms.exception.UnauthorizedActionException;
+import com.hsms.feignclient.BookingServiceClient;
 import com.hsms.feignclient.NotificationClient;
-import com.hsms.feignclient.ServiceRequestClient;
 import com.hsms.feignclient.TechnicianClient;
 import com.hsms.feignclient.UserServiceClient;
 import com.hsms.model.AssignmentDetailResponseDTO;
@@ -36,22 +36,20 @@ public class AssignmentServiceImpl implements AssignmentService {
 	private final AssignmentRepository assignmentRepository;
 	private final ModelMapper modelMapper;
 	private final TechnicianClient technicianClient;
-	private final ServiceRequestClient serviceRequestClient;
+	private final BookingServiceClient bookingserviceClient;
 	private final UserServiceClient userServiceClient;
 	private final NotificationClient notificationClient;
 
 	@Override
 	public AssignmentResponseDTO assignTechnician(AssignmentRequestDTO requestDTO) {
-		if (!currentUserHasRole("SERVICE_MANAGER")) {
-			throw new UnauthorizedActionException("Only SERVICE_MANAGER can assign technicians");
-		}
+		requireRole("SERVICE_MANAGER");
 
 		assignmentRepository.findByServiceRequestId(requestDTO.getServiceRequestId()).ifPresent(existing -> {
 			throw new DuplicateAssignmentException(
-					"An assignment already exists for service request id: " + requestDTO.getServiceRequestId());
+					"Assignment already exists for service request id: " + requestDTO.getServiceRequestId());
 		});
 
-		// ✅ Validate technician
+		// Validate technician
 		ResponseEntity<TechnicianDetailResponseDTO> techResponse = technicianClient
 				.getTechnicianById(requestDTO.getTechnicianId());
 		if (!techResponse.getStatusCode().is2xxSuccessful() || techResponse.getBody() == null) {
@@ -62,25 +60,25 @@ public class AssignmentServiceImpl implements AssignmentService {
 			throw new TechnicianNotAvailableException("Technician is not available");
 		}
 
-		// ✅ Validate service request
-		ResponseEntity<ServiceRequestDTO> srResponse = serviceRequestClient
+		// Validate service request
+		ResponseEntity<ServiceRequestDTO> srResponse = bookingserviceClient
 				.getServiceRequestById(requestDTO.getServiceRequestId());
 		if (!srResponse.getStatusCode().is2xxSuccessful() || srResponse.getBody() == null) {
 			throw new RuntimeException("Service request not found");
 		}
 		ServiceRequestDTO serviceRequest = srResponse.getBody();
-		if (!"OPEN".equalsIgnoreCase(serviceRequest.getStatus())) {
-			throw new RuntimeException("Service request is not valid for assignment");
+		if (!"CREATED".equalsIgnoreCase(serviceRequest.getStatus())) {
+			throw new RuntimeException("Only CREATED requests can be assigned");
 		}
 
-		// ✅ Validate user
+		// Validate user
 		ResponseEntity<UserDTO> userResponse = userServiceClient.getUserById(requestDTO.getUserId());
 		if (!userResponse.getStatusCode().is2xxSuccessful() || userResponse.getBody() == null) {
 			throw new RuntimeException("User not found");
 		}
 		UserDTO user = userResponse.getBody();
 
-		// ✅ Conflict check
+		// Conflict check
 		boolean conflict = assignmentRepository.existsByTechnicianIdAndStartTimeAndStatusIn(
 				requestDTO.getTechnicianId(), requestDTO.getStartTime(),
 				List.of(AssignmentStatus.ASSIGNED, AssignmentStatus.ACCEPTED));
@@ -88,7 +86,7 @@ public class AssignmentServiceImpl implements AssignmentService {
 			throw new TechnicianNotAvailableException("Technician already has a job at this time");
 		}
 
-		// ✅ Save assignment
+		// Save assignment
 		Assignment assignment = new Assignment();
 		assignment.setTechnicianId(requestDTO.getTechnicianId());
 		assignment.setServiceRequestId(requestDTO.getServiceRequestId());
@@ -98,61 +96,63 @@ public class AssignmentServiceImpl implements AssignmentService {
 
 		Assignment saved = assignmentRepository.save(assignment);
 
-		// ✅ Notify user
+		// Update Booking Service status
+		bookingserviceClient.updateStatus(requestDTO.getServiceRequestId(), "ASSIGNED");
+
+		// Notify user
 		notificationClient.sendNotification(new NotificationDTO(user.getId(),
 				"New assignment created for service request " + serviceRequest.getRequestId(), LocalDateTime.now()));
 
 		return modelMapper.map(saved, AssignmentResponseDTO.class);
 	}
-	
-	@Override
-	public List<AssignmentDetailResponseDTO> getAllAssignments() {
-		return assignmentRepository.findAll().stream().map(a -> modelMapper.map(a, AssignmentDetailResponseDTO.class)).toList();
-	}
 
 	@Override
 	public AssignmentResponseDTO acceptJob(Long assignmentId) {
+		requireRole("TECHNICIAN");
+
 		Assignment assignment = assignmentRepository.findById(assignmentId)
 				.orElseThrow(() -> new AssignmentNotFoundException("Assignment not found: " + assignmentId));
 
 		assignment.setStatus(AssignmentStatus.ACCEPTED);
 		Assignment updated = assignmentRepository.save(assignment);
 
-		// ✅ Notify manager
-		notificationClient.sendNotification(new NotificationDTO(null, // could be managerId if available
-				"Technician accepted assignment " + assignmentId, LocalDateTime.now()));
+		bookingserviceClient.updateStatus(assignment.getServiceRequestId(), "ACCEPTED");
+
+		notificationClient.sendNotification(
+				new NotificationDTO(null, "Technician accepted assignment " + assignmentId, LocalDateTime.now()));
 
 		return modelMapper.map(updated, AssignmentResponseDTO.class);
 	}
 
 	@Override
 	public AssignmentResponseDTO rejectJob(Long assignmentId) {
+		requireRole("TECHNICIAN");
+
 		Assignment assignment = assignmentRepository.findById(assignmentId)
 				.orElseThrow(() -> new AssignmentNotFoundException("Assignment not found: " + assignmentId));
 
 		assignment.setStatus(AssignmentStatus.REJECTED);
 		Assignment updated = assignmentRepository.save(assignment);
 
-		// ✅ Notify manager
-		notificationClient.sendNotification(new NotificationDTO(null, // could be managerId if available
-				"Technician rejected assignment " + assignmentId, LocalDateTime.now()));
+		bookingserviceClient.updateStatus(assignment.getServiceRequestId(), "REJECTED");
+
+		notificationClient.sendNotification(
+				new NotificationDTO(null, "Technician rejected assignment " + assignmentId, LocalDateTime.now()));
 
 		return modelMapper.map(updated, AssignmentResponseDTO.class);
 	}
 
 	@Override
 	public AssignmentResponseDTO reassignTechnician(Long assignmentId, Long technicianId, LocalDateTime startTime) {
+		requireRole("SERVICE_MANAGER");
+
 		Assignment assignment = assignmentRepository.findById(assignmentId)
 				.orElseThrow(() -> new AssignmentNotFoundException("Assignment not found: " + assignmentId));
 
 		if (assignment.getStatus() != AssignmentStatus.REJECTED) {
 			throw new RuntimeException("Only REJECTED jobs can be reassigned");
 		}
-		if (startTime == null) {
-			throw new RuntimeException("Start time must be provided for reassignment");
-		}
 
-		// ✅ Validate technician
 		ResponseEntity<TechnicianDetailResponseDTO> techResponse = technicianClient.getTechnicianById(technicianId);
 		if (!techResponse.getStatusCode().is2xxSuccessful() || techResponse.getBody() == null) {
 			throw new TechnicianNotAvailableException("Technician not found");
@@ -162,13 +162,8 @@ public class AssignmentServiceImpl implements AssignmentService {
 			throw new TechnicianNotAvailableException("Technician is not available");
 		}
 
-		// ✅ Conflict check
-		boolean conflict = assignmentRepository
-				.findByTechnicianIdAndStatusIn(technicianId,
-						List.of(AssignmentStatus.ASSIGNED, AssignmentStatus.ACCEPTED))
-				.stream().anyMatch(a -> !a.getId().equals(assignmentId) && a.getStartTime() != null
-						&& a.getStartTime().toLocalDate().equals(startTime.toLocalDate()));
-
+		boolean conflict = assignmentRepository.existsByTechnicianIdAndStartTimeAndStatusIn(technicianId, startTime,
+				List.of(AssignmentStatus.ASSIGNED, AssignmentStatus.ACCEPTED));
 		if (conflict) {
 			throw new TechnicianNotAvailableException("Technician already has a job at this time");
 		}
@@ -180,30 +175,39 @@ public class AssignmentServiceImpl implements AssignmentService {
 
 		Assignment updated = assignmentRepository.save(assignment);
 
-		// ✅ Notify manager
-		notificationClient.sendNotification(new NotificationDTO(null, // could be managerId if available
+		bookingserviceClient.updateStatus(assignment.getServiceRequestId(), "REASSIGNED");
+
+		notificationClient.sendNotification(new NotificationDTO(null,
 				"Assignment " + assignmentId + " reassigned to technician " + technicianId, LocalDateTime.now()));
 
 		return modelMapper.map(updated, AssignmentResponseDTO.class);
 	}
 
 	@Override
+	public List<AssignmentDetailResponseDTO> getAllAssignments() {
+		return assignmentRepository.findAll().stream().map(a -> modelMapper.map(a, AssignmentDetailResponseDTO.class))
+				.toList();
+	}
+
+	@Override
 	public void deleteAssignment(Long assignmentId) {
+		requireRole("SERVICE_MANAGER");
+
 		Assignment assignment = assignmentRepository.findById(assignmentId)
 				.orElseThrow(() -> new AssignmentNotFoundException("Assignment not found: " + assignmentId));
 		assignmentRepository.delete(assignment);
+
+		bookingserviceClient.updateStatus(assignment.getServiceRequestId(), "CANCELLED");
 	}
 
-	private boolean currentUserHasRole(String role) {
+	private void requireRole(String... allowedRoles) {
 		ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
 		if (attrs == null)
-			return false;
+			throw new UnauthorizedActionException("No request context available");
 		HttpServletRequest request = attrs.getRequest();
-		String headerRole = request.getHeader("X-Role");
-		return role.equalsIgnoreCase(headerRole);
+		String role = request.getHeader("X-User-Role");
+		if (role == null || Arrays.stream(allowedRoles).noneMatch(r -> r.equalsIgnoreCase(role))) {
+			throw new UnauthorizedActionException("Access denied for role: " + role);
+		}
 	}
-
-	
-
-	
 }

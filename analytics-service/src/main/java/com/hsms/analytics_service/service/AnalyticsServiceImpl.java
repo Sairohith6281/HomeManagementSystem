@@ -8,8 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.hsms.analytics_service.entity.AnalyticsReport;
 import com.hsms.analytics_service.feignclient.PaymentClient;
-import com.hsms.analytics_service.feignclient.ServiceRequestClient;
 import com.hsms.analytics_service.feignclient.TechnicianClient;
+import com.hsms.analytics_service.feignclient.bookingServiceClient;
 import com.hsms.analytics_service.model.CategoryDistributionDTO;
 import com.hsms.analytics_service.model.DashboardResponseDTO;
 import com.hsms.analytics_service.model.PaymentResponseDTO;
@@ -24,7 +24,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 	private AnalyticsReportRepository repo;
 
 	@Autowired
-	private ServiceRequestClient requestClient;
+	private bookingServiceClient bookingClient;
 
 	@Autowired
 	private TechnicianClient technicianClient;
@@ -35,7 +35,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 	@Override
 	public DashboardResponseDTO getDashboard() {
 
-		List<ServiceRequestDetailResponseDTO> requests = requestClient.getAllRequests();
+		List<ServiceRequestDetailResponseDTO> requests = bookingClient.getAllRequests();
 		List<TechnicianDetailResponseDTO> technicians = technicianClient.getAllTechnicians();
 		List<PaymentResponseDTO> payments = paymentClient.getAllPayments();
 //		int totalBookings = 25;

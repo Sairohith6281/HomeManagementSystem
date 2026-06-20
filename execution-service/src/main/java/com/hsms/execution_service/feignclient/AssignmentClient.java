@@ -8,6 +8,6 @@ import com.hsms.execution_service.model.AssignmentResponseDTO;
 
 @FeignClient(name = "assignment-service")
 public interface AssignmentClient {
-    @GetMapping("/api/assignments/service-request/{serviceRequestId}")
+    @GetMapping("/api/assignments/service-request/{bookingRequestId}")
     AssignmentResponseDTO getByServiceRequestId(@PathVariable Long serviceRequestId);
 }
