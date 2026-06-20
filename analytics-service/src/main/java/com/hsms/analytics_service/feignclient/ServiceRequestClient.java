@@ -7,7 +7,7 @@ import com.hsms.analytics_service.model.ServiceRequestDetailResponseDTO;
 
 @FeignClient(name = "service-request-service")
 public interface ServiceRequestClient {
-	
+
     @GetMapping("/api/requests")
     List<ServiceRequestDetailResponseDTO> getAllRequests();
 }

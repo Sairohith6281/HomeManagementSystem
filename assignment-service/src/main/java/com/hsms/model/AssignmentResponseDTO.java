@@ -13,5 +13,6 @@ public class AssignmentResponseDTO {
     private Long technicianId;
     private Long serviceRequestId;
     private LocalDateTime assignedDate;
+    private LocalDateTime startTime;
     private String status;
 }

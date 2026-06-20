@@ -1,5 +1,6 @@
-	package com.hsms.repository;
+package com.hsms.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,10 +10,12 @@ import com.hsms.entity.AssignmentStatus;
 
 public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
 
-	boolean existsByTechnicianIdAndStatusIn(Long technicianId, List<AssignmentStatus> status);
-//	boolean existsByServiceRequestId(Long serviceRequestId);
 	Optional<Assignment> findByServiceRequestId(Long serviceRequestId);
-//	 List<Assignment> findByTechnicianId(Long technicianId);
-	 List<Assignment> findByTechnicianIdAndStatusIn(Long technicianId, List<AssignmentStatus> of);
-	 Optional<Assignment> findByTechnicianId(Long technicianId);
+
+	List<Assignment> findByTechnicianIdAndStatusIn(Long technicianId, List<AssignmentStatus> of);
+
+	Optional<Assignment> findByTechnicianId(Long technicianId);
+
+	boolean existsByTechnicianIdAndStartTimeAndStatusIn(Long technicianId, LocalDateTime startTime,
+			List<AssignmentStatus> of);
 }

@@ -9,6 +9,11 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PaymentSummaryDTO {
-    private double totalRevenue;
+public class PaymentResponseDTO {
+
+    private Long paymentId;
+    private Long serviceRequestId;
+    private Double amount;
+    private String paymentMethod;
+    private String paymentStatus;
 }

@@ -17,4 +17,6 @@ public class ServiceRequestDTO {
 	private String status;
 	private String address;
 	private LocalDateTime scheduledTime;
+	private Long UserId;
+
 }
