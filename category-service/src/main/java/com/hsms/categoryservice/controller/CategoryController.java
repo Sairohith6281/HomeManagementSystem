@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hsms.categoryservice.model.CategoryRequestDTO;
+import com.hsms.categoryservice.model.CategoryStatusDTO;
 import com.hsms.categoryservice.model.CategoryResponseDTO;
 import com.hsms.categoryservice.service.CategoryService;
 
@@ -25,54 +27,52 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/categories")
 public class CategoryController {
 
-    @Autowired
-    private CategoryService categoryService;
+	@Autowired
+	private CategoryService categoryService;
 
-    @PostMapping
-    public ResponseEntity<CategoryResponseDTO> addCategory(
-            @Valid @RequestBody CategoryRequestDTO category) {
+	@PostMapping
+	public ResponseEntity<CategoryResponseDTO> addCategory(@Valid @RequestBody CategoryRequestDTO category) {
 
-        return new ResponseEntity<>(
-                categoryService.addCategory(category),
-                HttpStatus.CREATED);
-    }
+		return new ResponseEntity<>(categoryService.addCategory(category), HttpStatus.CREATED);
+	}
 
-    @GetMapping("/{categoryId}")
-    public ResponseEntity<CategoryResponseDTO> getCategoryById(
-            @PathVariable Long categoryId) {
+	@PatchMapping("/{categoryId}/status")
+	public ResponseEntity<CategoryResponseDTO> updateCategoryStatus(@PathVariable Long categoryId,
+			@Valid @RequestBody CategoryStatusDTO statusDTO) {
 
-        return ResponseEntity.ok(
-                categoryService.findCategoryById(categoryId));
-    }
+		CategoryResponseDTO response = categoryService.updateCategoryStatus(categoryId, statusDTO);
 
-    @GetMapping("/all")
-    public ResponseEntity<List<CategoryResponseDTO>> getAllCategories() {
+		return ResponseEntity.ok(response);
+	}
 
-        return ResponseEntity.ok(
-                categoryService.findAllCategories());
-    }
+	@GetMapping("/{categoryId}")
+	public ResponseEntity<CategoryResponseDTO> getCategoryById(@PathVariable Long categoryId) {
 
-    @GetMapping("/active")
-    public ResponseEntity<List<CategoryResponseDTO>> getActiveCategories() {
+		return ResponseEntity.ok(categoryService.findCategoryById(categoryId));
+	}
 
-        return ResponseEntity.ok(
-                categoryService.getActiveCategories());
-    }
+	@GetMapping("/all")
+	public ResponseEntity<List<CategoryResponseDTO>> getAllCategories() {
 
-    @PutMapping("/{categoryId}")
-    public ResponseEntity<CategoryResponseDTO> updateCategory(
-            @PathVariable Long categoryId,
-            @Valid @RequestBody CategoryRequestDTO category) {
+		return ResponseEntity.ok(categoryService.findAllCategories());
+	}
 
-        return ResponseEntity.ok(
-                categoryService.updateCategory(categoryId, category));
-    }
+	@GetMapping("/active")
+	public ResponseEntity<List<CategoryResponseDTO>> getActiveCategories() {
 
-    @DeleteMapping("/{categoryId}")
-    public ResponseEntity<String> deleteCategory(
-            @PathVariable Long categoryId) {
+		return ResponseEntity.ok(categoryService.getActiveCategories());
+	}
 
-        return ResponseEntity.ok(
-                categoryService.deleteCategory(categoryId));
-    }
+	@PutMapping("/{categoryId}")
+	public ResponseEntity<CategoryResponseDTO> updateCategory(@PathVariable Long categoryId,
+			@Valid @RequestBody CategoryRequestDTO category) {
+
+		return ResponseEntity.ok(categoryService.updateCategory(categoryId, category));
+	}
+
+	@DeleteMapping("/{categoryId}")
+	public ResponseEntity<String> deleteCategory(@PathVariable Long categoryId) {
+
+		return ResponseEntity.ok(categoryService.deleteCategory(categoryId));
+	}
 }
