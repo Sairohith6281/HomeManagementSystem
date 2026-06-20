@@ -16,21 +16,17 @@ import com.hsms.analytics_service.model.DashboardResponseDTO;
 import com.hsms.analytics_service.model.TechnicianDetailResponseDTO;
 import com.hsms.analytics_service.repository.AnalyticsReportRepository;
 
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @Service
 public class AnalyticsServiceImpl implements AnalyticsService {
-	@Autowired
-	private AnalyticsReportRepository repo;
-	@Autowired
-	private ServiceRequestClient requestClient;
-	@Autowired
-	private TechnicianClient technicianClient;
-	@Autowired
-	private CategoryClient categoryClient;
-	@Autowired
-	private PaymentClient paymentClient;
-	@Autowired
-	private ModelMapper mapper;
+	private final AnalyticsReportRepository repo;
+	private final ServiceRequestClient requestClient;
+	private final TechnicianClient technicianClient;
+	private final CategoryClient categoryClient;
+	private final PaymentClient paymentClient;
+	private final ModelMapper mapper;
 
 	@Override
 	public DashboardResponseDTO getDashboard() {
