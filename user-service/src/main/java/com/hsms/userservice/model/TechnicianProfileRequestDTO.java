@@ -1,4 +1,4 @@
-package com.hsms.userservice.model;
+	package com.hsms.userservice.model;
 
 import com.hsms.userservice.enums.AvailabilityStatus;
 

@@ -1,17 +1,26 @@
 package com.hsms.userservice.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+import java.time.LocalDateTime;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
-@Table(name="customers")
+@Table(name = "customers")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Customer {
 
-    @Id
+	@Id
 //    @GeneratedValue(
 //            strategy = GenerationType.SEQUENCE,
 //            generator = "customer_seq"
@@ -23,11 +32,22 @@ public class Customer {
 //    )
 //    private Long customerId;
 
-    private Long userId;
+	private Long userId;
 
-    private String address;
+	private String address;
 
-    private String city;
+	private String city;
+	private String name;
 
-    private String pincode;
+	private String pincode;
+
+	@Column(name = "CREATED_AT", nullable = false)
+	private LocalDateTime createdAt;
+
+	@PrePersist
+	public void prePersist() {
+		if (createdAt == null) {
+			createdAt = LocalDateTime.now();
+		}
+	}
 }

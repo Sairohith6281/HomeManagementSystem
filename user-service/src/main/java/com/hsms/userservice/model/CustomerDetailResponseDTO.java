@@ -1,5 +1,7 @@
 package com.hsms.userservice.model;
 
+import java.time.LocalDateTime;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,4 +16,5 @@ public class CustomerDetailResponseDTO {
     private String address;
     private String city;
     private String pincode;
+    private LocalDateTime createdAt;
 }

@@ -40,6 +40,7 @@ public class CustomerController {
 			@RequestHeader("X-User-Email") String email,
 
 			@RequestBody CustomerProfileRequestDTO dto) {
+		System.out.println(role);
 
 		RoleValidator.validate(role, Roles.CUSTOMER, Roles.ADMIN);
 
@@ -65,7 +66,7 @@ public class CustomerController {
 //        return ResponseEntity.ok(
 //                service.getAllCustomers());
 //    }
-	
+
 	@PreAuthorize("hasAnyRole('ADMIN','SERVICE_MANAGER')")
 	@GetMapping
 	public ResponseEntity<List<CustomerDetailResponseDTO>> getAllCustomers(
