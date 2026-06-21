@@ -12,12 +12,15 @@ import com.hsms.entity.Assignment;
 import com.hsms.entity.AssignmentStatus;
 import com.hsms.exception.AssignmentNotFoundException;
 import com.hsms.exception.DuplicateAssignmentException;
+import com.hsms.exception.InvalidOperationException;
+import com.hsms.exception.ResourceNotFoundException;
+import com.hsms.exception.ServiceRequestNotFoundException;
 import com.hsms.exception.TechnicianNotAvailableException;
 import com.hsms.exception.UnauthorizedActionException;
-import com.hsms.feignclient.BookingServiceClient;
 import com.hsms.feignclient.NotificationClient;
 import com.hsms.feignclient.TechnicianClient;
 import com.hsms.feignclient.UserServiceClient;
+import com.hsms.feignclient.BookingServiceClient;
 import com.hsms.model.AssignmentDetailResponseDTO;
 import com.hsms.model.AssignmentRequestDTO;
 import com.hsms.model.AssignmentResponseDTO;
@@ -36,7 +39,7 @@ public class AssignmentServiceImpl implements AssignmentService {
 	private final AssignmentRepository assignmentRepository;
 	private final ModelMapper modelMapper;
 	private final TechnicianClient technicianClient;
-	private final BookingServiceClient bookingserviceClient;
+	private final BookingServiceClient bookingServiceClient;
 	private final UserServiceClient userServiceClient;
 	private final NotificationClient notificationClient;
 
@@ -52,31 +55,31 @@ public class AssignmentServiceImpl implements AssignmentService {
 		// Validate technician
 		ResponseEntity<TechnicianDetailResponseDTO> techResponse = technicianClient
 				.getTechnicianById(requestDTO.getTechnicianId());
-		if (!techResponse.getStatusCode().is2xxSuccessful() || techResponse.getBody() == null) {
+		TechnicianDetailResponseDTO technician = techResponse.getBody();
+		if (!techResponse.getStatusCode().is2xxSuccessful() || technician == null) {
 			throw new TechnicianNotAvailableException("Technician not found");
 		}
-		TechnicianDetailResponseDTO technician = techResponse.getBody();
 		if (!"Available".equalsIgnoreCase(technician.getAvailability())) {
 			throw new TechnicianNotAvailableException("Technician is not available");
 		}
 
 		// Validate service request
-		ResponseEntity<ServiceRequestDTO> srResponse = bookingserviceClient
+		ResponseEntity<ServiceRequestDTO> srResponse = bookingServiceClient
 				.getServiceRequestById(requestDTO.getServiceRequestId());
-		if (!srResponse.getStatusCode().is2xxSuccessful() || srResponse.getBody() == null) {
-			throw new RuntimeException("Service request not found");
-		}
 		ServiceRequestDTO serviceRequest = srResponse.getBody();
+		if (!srResponse.getStatusCode().is2xxSuccessful() || serviceRequest == null) {
+			throw new ServiceRequestNotFoundException("Service request not found: " + requestDTO.getServiceRequestId());
+		}
 		if (!"CREATED".equalsIgnoreCase(serviceRequest.getStatus())) {
-			throw new RuntimeException("Only CREATED requests can be assigned");
+			throw new InvalidOperationException("Only CREATED requests can be assigned");
 		}
 
 		// Validate user
 		ResponseEntity<UserDTO> userResponse = userServiceClient.getUserById(requestDTO.getUserId());
-		if (!userResponse.getStatusCode().is2xxSuccessful() || userResponse.getBody() == null) {
-			throw new RuntimeException("User not found");
-		}
 		UserDTO user = userResponse.getBody();
+		if (!userResponse.getStatusCode().is2xxSuccessful() || user == null) {
+			throw new ResourceNotFoundException("User not found: " + requestDTO.getUserId());
+		}
 
 		// Conflict check
 		boolean conflict = assignmentRepository.existsByTechnicianIdAndStartTimeAndStatusIn(
@@ -97,7 +100,7 @@ public class AssignmentServiceImpl implements AssignmentService {
 		Assignment saved = assignmentRepository.save(assignment);
 
 		// Update Booking Service status
-		bookingserviceClient.updateStatus(requestDTO.getServiceRequestId(), "ASSIGNED");
+		bookingServiceClient.updateStatus(requestDTO.getServiceRequestId(), "ASSIGNED");
 
 		// Notify user
 		notificationClient.sendNotification(new NotificationDTO(user.getId(),
@@ -116,7 +119,7 @@ public class AssignmentServiceImpl implements AssignmentService {
 		assignment.setStatus(AssignmentStatus.ACCEPTED);
 		Assignment updated = assignmentRepository.save(assignment);
 
-		bookingserviceClient.updateStatus(assignment.getServiceRequestId(), "ACCEPTED");
+		bookingServiceClient.updateStatus(assignment.getServiceRequestId(), "ACCEPTED");
 
 		notificationClient.sendNotification(
 				new NotificationDTO(null, "Technician accepted assignment " + assignmentId, LocalDateTime.now()));
@@ -134,7 +137,7 @@ public class AssignmentServiceImpl implements AssignmentService {
 		assignment.setStatus(AssignmentStatus.REJECTED);
 		Assignment updated = assignmentRepository.save(assignment);
 
-		bookingserviceClient.updateStatus(assignment.getServiceRequestId(), "REJECTED");
+		bookingServiceClient.updateStatus(assignment.getServiceRequestId(), "REJECTED");
 
 		notificationClient.sendNotification(
 				new NotificationDTO(null, "Technician rejected assignment " + assignmentId, LocalDateTime.now()));
@@ -150,14 +153,14 @@ public class AssignmentServiceImpl implements AssignmentService {
 				.orElseThrow(() -> new AssignmentNotFoundException("Assignment not found: " + assignmentId));
 
 		if (assignment.getStatus() != AssignmentStatus.REJECTED) {
-			throw new RuntimeException("Only REJECTED jobs can be reassigned");
+			throw new InvalidOperationException("Only REJECTED jobs can be reassigned");
 		}
 
 		ResponseEntity<TechnicianDetailResponseDTO> techResponse = technicianClient.getTechnicianById(technicianId);
-		if (!techResponse.getStatusCode().is2xxSuccessful() || techResponse.getBody() == null) {
+		TechnicianDetailResponseDTO technician = techResponse.getBody();
+		if (!techResponse.getStatusCode().is2xxSuccessful() || technician == null) {
 			throw new TechnicianNotAvailableException("Technician not found");
 		}
-		TechnicianDetailResponseDTO technician = techResponse.getBody();
 		if (!"Available".equalsIgnoreCase(technician.getAvailability())) {
 			throw new TechnicianNotAvailableException("Technician is not available");
 		}
@@ -175,7 +178,7 @@ public class AssignmentServiceImpl implements AssignmentService {
 
 		Assignment updated = assignmentRepository.save(assignment);
 
-		bookingserviceClient.updateStatus(assignment.getServiceRequestId(), "REASSIGNED");
+		bookingServiceClient.updateStatus(assignment.getServiceRequestId(), "REASSIGNED");
 
 		notificationClient.sendNotification(new NotificationDTO(null,
 				"Assignment " + assignmentId + " reassigned to technician " + technicianId, LocalDateTime.now()));
@@ -197,13 +200,14 @@ public class AssignmentServiceImpl implements AssignmentService {
 				.orElseThrow(() -> new AssignmentNotFoundException("Assignment not found: " + assignmentId));
 		assignmentRepository.delete(assignment);
 
-		bookingserviceClient.updateStatus(assignment.getServiceRequestId(), "CANCELLED");
+		bookingServiceClient.updateStatus(assignment.getServiceRequestId(), "CANCELLED");
 	}
 
 	private void requireRole(String... allowedRoles) {
 		ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-		if (attrs == null)
+		if (attrs == null) {
 			throw new UnauthorizedActionException("No request context available");
+		}
 		HttpServletRequest request = attrs.getRequest();
 		String role = request.getHeader("X-User-Role");
 		if (role == null || Arrays.stream(allowedRoles).noneMatch(r -> r.equalsIgnoreCase(role))) {
