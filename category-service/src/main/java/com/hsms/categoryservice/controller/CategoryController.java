@@ -75,4 +75,9 @@ public class CategoryController {
 
 		return ResponseEntity.ok(categoryService.deleteCategory(categoryId));
 	}
+
+	@GetMapping("/{categoryId}/exists")
+	public ResponseEntity<Boolean> categoryExists(@PathVariable Long categoryId) {
+		return ResponseEntity.ok(categoryService.categoryExists(categoryId));
+	}
 }

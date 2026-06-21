@@ -24,4 +24,6 @@ public interface CategoryService {
     CategoryResponseDTO updateCategoryStatus(
             Long categoryId,
             CategoryStatusDTO statusDTO);
+
+    Boolean categoryExists(Long categoryId);
 }

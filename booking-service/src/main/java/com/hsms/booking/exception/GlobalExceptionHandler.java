@@ -58,4 +58,29 @@ public class GlobalExceptionHandler {
 
 		return ResponseEntity.badRequest().body(response);
 	}
+
+	@ExceptionHandler(feign.FeignException.NotFound.class)
+	public ResponseEntity<?> handleFeignNotFound(feign.FeignException.NotFound ex) {
+
+		Map<String, Object> response = new HashMap<>();
+
+		response.put("timestamp", LocalDateTime.now());
+		response.put("status", 404);
+		response.put("message", ex.getMessage());
+
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+	}
+
+	@ExceptionHandler(feign.FeignException.class)
+	public ResponseEntity<?> handleFeignException(feign.FeignException ex) {
+
+		Map<String, Object> response = new HashMap<>();
+
+		response.put("timestamp", LocalDateTime.now());
+		int status = ex.status() > 0 ? ex.status() : 503;
+		response.put("status", status);
+		response.put("message", ex.getMessage());
+
+		return ResponseEntity.status(status).body(response);
+	}
 }

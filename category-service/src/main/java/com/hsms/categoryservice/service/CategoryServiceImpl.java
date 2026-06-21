@@ -110,6 +110,11 @@ public class CategoryServiceImpl implements CategoryService {
 		ServiceCategory category = categoryRepo.findById(categoryId)
 				.orElseThrow(() -> new ResourceNotFoundException("Category not found with id : " + categoryId));
 
+		if (!category.getCategoryName().equalsIgnoreCase(categoryRequest.getCategoryName())
+				&& categoryRepo.existsByCategoryName(categoryRequest.getCategoryName())) {
+			throw new DuplicateCategoryException("Category already exists with name : " + categoryRequest.getCategoryName());
+		}
+
 		category.setCategoryName(categoryRequest.getCategoryName());
 
 		category.setDescription(categoryRequest.getDescription());
@@ -174,8 +179,13 @@ public class CategoryServiceImpl implements CategoryService {
 
 		category.setActive(false);
 
-		categoryRepo.delete(category);
+		categoryRepo.save(category);
 
 		return "Category deleted successfully";
+	}
+
+	@Override
+	public Boolean categoryExists(Long categoryId) {
+		return categoryRepo.existsById(categoryId);
 	}
 }

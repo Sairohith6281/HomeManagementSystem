@@ -21,7 +21,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import java.util.List;
 
 @RestController
-@RequestMapping("")
+@RequestMapping("/api/service-requests")
 @Tag(name = "Service Requests", description = "Service request management endpoints")
 public class ServiceRequestController {
 
@@ -32,7 +32,7 @@ public class ServiceRequestController {
 		this.serviceRequestService = serviceRequestService;
 	}
 
-	@PreAuthorize("hasRole('CUSTOMER')")
+	@PreAuthorize("hasAuthority('ROLE_CUSTOMER')")
 	@PostMapping
 	@Operation(summary = "Create new service request")
 	public ResponseEntity<ServiceRequestResponse> createServiceRequest(@Valid @RequestBody ServiceRequestDTO request,
@@ -46,7 +46,7 @@ public class ServiceRequestController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
-	@PreAuthorize("hasRole('CUSTOMER')")
+	@PreAuthorize("hasAuthority('ROLE_CUSTOMER')")
 	@GetMapping("/my-requests")
 	public ResponseEntity<Page<ServiceRequestResponse>> getMyRequests(
 
@@ -57,7 +57,7 @@ public class ServiceRequestController {
 		return ResponseEntity.ok(serviceRequestService.getMyRequests(customerId, pageable));
 	}
 
-	@PreAuthorize("hasAnyRole('ADMIN','SERVICE_MANAGER')")
+	@PreAuthorize("hasAnyAuthority('ADMIN','SERVICE_MANAGER')")
 	@GetMapping
 	@Operation(summary = "Get all service requests")
 	public ResponseEntity<Page<ServiceRequestResponse>> getAllRequests(
@@ -71,18 +71,6 @@ public class ServiceRequestController {
 		return ResponseEntity.ok(requests);
 	}
 
-	@PutMapping("/{requestId}/assign/{technicianId}")
-	public ResponseEntity<ServiceRequestResponse> assignTechnician(
-
-			@PathVariable Long requestId,
-
-			@PathVariable Long technicianId) {
-
-		return ResponseEntity.ok(
-
-				serviceRequestService.assignTechnician(requestId, technicianId));
-	}
-
 	@GetMapping("/{id}")
 	@Operation(summary = "Get service request by ID")
 	public ResponseEntity<ServiceRequestResponse> getRequestById(@PathVariable Long id) {
@@ -94,7 +82,7 @@ public class ServiceRequestController {
 		return ResponseEntity.ok(response);
 	}
 
-	@PreAuthorize("hasRole('CUSTOMER')")
+	@PreAuthorize("hasAuthority('ROLE_CUSTOMER')")
 	@PutMapping("/{id}/cancel")
 	public ResponseEntity<ServiceRequestResponse> cancelRequest(
 
@@ -144,7 +132,7 @@ public class ServiceRequestController {
 		return ResponseEntity.ok(requests);
 	}
 
-	@PreAuthorize("hasAnyRole('ADMIN','SERVICE_MANAGER')")
+	@PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_SERVICE_MANAGER')")
 	@PutMapping("/{id}/status")
 	@Operation(summary = "Update service request status")
 	public ResponseEntity<ServiceRequestResponse> updateServiceRequestStatus(@PathVariable Long id,

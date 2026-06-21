@@ -56,6 +56,9 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                 Long userId = jwtUtil.extractUserId(authHeader);
                 String email = jwtUtil.extractUsername(authHeader);
                 String role = jwtUtil.extractRole(authHeader).toUpperCase();
+                if (role.startsWith("ROLE_")) {
+                    role = role.substring(5);
+                }
 
                 String path = exchange.getRequest().getURI().getPath();
                 String method = exchange.getRequest().getMethod().name();
@@ -90,6 +93,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                     if (HttpMethod.POST.matches(method)) {
 
                         if (!(role.equals("ADMIN")
+                        		|| !role.equals("TECHNICIAN")
                                 || role.equals("SERVICE_MANAGER"))) {
 
                             exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
@@ -139,8 +143,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 
                     if (HttpMethod.POST.matches(method)) {
 
-                        if (!(role.equals("CUSTOMER")
-                                || role.equals("ADMIN"))) {
+                        if (!role.equals("CUSTOMER")) {
 
                             exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
                             return exchange.getResponse().setComplete();
@@ -161,10 +164,34 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 
                     if (HttpMethod.PUT.matches(method)) {
 
-                        if (!(role.equals("TECHNICIAN")
-                                || role.equals("ADMIN")
-                                || role.equals("SERVICE_MANAGER"))) {
+                        if (path.endsWith("/cancel") || path.matches("/api/service-requests/\\d+")) {
+                            if (!role.equals("CUSTOMER")) {
+                                exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+                                return exchange.getResponse().setComplete();
+                            }
+                        } else {
+                            if (!(role.equals("ADMIN")
+                                    || role.equals("SERVICE_MANAGER")
+                                    || role.equals("TECHNICIAN"))) {
 
+                                exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+                                return exchange.getResponse().setComplete();
+                            }
+                        }
+                    }
+                }
+
+                // ===============================
+                // SERVICE CATEGORY APIs
+                // ===============================
+                if (path.startsWith("/api/categories")) {
+
+                    if (HttpMethod.POST.matches(method)
+                            || HttpMethod.PUT.matches(method)
+                            || HttpMethod.DELETE.matches(method)
+                            || HttpMethod.PATCH.matches(method)) {
+
+                        if (!role.equals("ADMIN")) {
                             exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
                             return exchange.getResponse().setComplete();
                         }

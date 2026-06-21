@@ -7,8 +7,8 @@ import lombok.Setter;
 @Setter
 public class CustomerProfileRequestDTO {
 
-    private Long userId;
-    private String name;
+//    private Long userId;
+//   private String name;
     private String address;
     private String city;
     private String pincode;

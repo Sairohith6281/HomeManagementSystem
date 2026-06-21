@@ -38,15 +38,17 @@ public class TechnicianController {
 	 * return new ResponseEntity<>( service.createTechnician(dto),
 	 * HttpStatus.CREATED); }
 	 */
-	@PreAuthorize("hasRole('ADMIN')")
+
+	@PreAuthorize("hasAnyRole('TECHNICIAN','ADMIN')")
 	@PostMapping
 	public ResponseEntity<TechnicianDetailResponseDTO> createTechnician(
 
 			@RequestHeader("X-User-Role") String role,
 
 			@RequestBody TechnicianProfileRequestDTO dto) {
-
-		RoleValidator.validate(role, Roles.ADMIN);
+		
+//		RoleValidator.validate(role, Roles.TECHNICIAN);
+//		RoleValidator.validate(role, Roles.ADMIN);
 
 		return new ResponseEntity<>(service.createTechnician(dto), HttpStatus.CREATED);
 	}

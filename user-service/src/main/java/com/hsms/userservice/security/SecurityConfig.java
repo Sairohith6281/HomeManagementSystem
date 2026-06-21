@@ -23,7 +23,9 @@ public class SecurityConfig {
 
 		http.csrf(csrf -> csrf.disable())
 
-				.authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+				.authorizeHttpRequests(auth -> auth
+						.requestMatchers("/error").permitAll()
+						.anyRequest().authenticated())
 
 				.anonymous(anonymous -> anonymous.disable())
 

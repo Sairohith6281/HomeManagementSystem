@@ -39,17 +39,20 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public CustomerDetailResponseDTO createCustomer(CustomerProfileRequestDTO dto, Long userId, String email) {
 
-		Customer customer = modelMapper.map(dto, Customer.class);
+		Customer customer = modelMapper.map(dto, Customer.class); // converted to Entity
 
 		customer.setUserId(userId);
 		customer.setCreatedAt(LocalDateTime.now()); // Add this
-
+		
 		Customer saved = customerRepository.save(customer);
+		
+		UserProfileResponseDTO user = authFeignClient.getUserById(userId);
 
 		CustomerDetailResponseDTO response = modelMapper.map(saved, CustomerDetailResponseDTO.class);
 
 		response.setUserId(userId);
 		response.setEmail(email);
+		response.setName(user.getName());
 
 		return response;
 	}
@@ -60,7 +63,7 @@ public class UserServiceImpl implements UserService {
 		Customer customer = customerRepository.findByUserId(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("Customer Not Found"));
 
-		customer.setName(dto.getName()); // Manual
+	//	customer.setName(dto.getName()); // Manual
 		customer.setAddress(dto.getAddress()); // Manual
 		customer.setCity(dto.getCity()); // Manual
 		customer.setPincode(dto.getPincode()); // Manual

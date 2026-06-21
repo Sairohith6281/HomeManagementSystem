@@ -1,5 +1,6 @@
 package com.hsms.booking.client;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,5 +20,6 @@ public class CategoryDTO {
     private String categoryName;
     private String description;
     private BigDecimal basePrice;
+    @JsonProperty("active")
     private Boolean isActive;
 }

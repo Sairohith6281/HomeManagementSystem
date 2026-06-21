@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.hsms.authservice.entity.Role;
 import com.hsms.authservice.entity.User;
 import com.hsms.authservice.exception.InvalidCredentialsException;
+import com.hsms.authservice.exception.ResourceAlreadyExistsException;
 import com.hsms.authservice.model.LoginRequestDTO;
 import com.hsms.authservice.model.LoginResponseDTO;
 import com.hsms.authservice.model.RegisterRequestDTO;
@@ -41,7 +42,7 @@ implements AuthService {
     public RegisterResponseDTO register(RegisterRequestDTO dto) {
 
         if (userRepository.existsByEmail(dto.getEmail())) {
-            throw new RuntimeException("Email Already Exists");
+            throw new ResourceAlreadyExistsException("Email Already Exists");
         }
 
         User user = new User();
