@@ -1,6 +1,5 @@
 package com.hsms.execution_service.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,12 +13,14 @@ import com.hsms.execution_service.model.ServiceRecordRequestDTO;
 import com.hsms.execution_service.model.ServiceRecordResponseDTO;
 import com.hsms.execution_service.service.ServiceRecordService;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/records")
 public class ServiceRecordController {
 
-	@Autowired
-	private ServiceRecordService service;
+	private final ServiceRecordService service;
 
 	@PostMapping("/start")
 	public ResponseEntity<ServiceRecordResponseDTO> start(@RequestBody ServiceRecordRequestDTO dto) {

@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import com.hsms.analytics_service.model.ServiceRequestDetailResponseDTO;
 
 @FeignClient(name = "booking-service")
-public interface bookingServiceClient {
+public interface BookingServiceClient {
 
     @GetMapping("/api/requests")
     List<ServiceRequestDetailResponseDTO> getAllRequests();
