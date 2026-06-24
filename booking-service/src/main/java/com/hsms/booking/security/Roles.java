@@ -1,6 +1,10 @@
 package com.hsms.booking.security;
 
-public class Roles {
+public final class Roles {
+
+	private Roles() {
+		throw new IllegalStateException("Utility class");
+	}
 
 	public static final String ADMIN = "ADMIN";
 

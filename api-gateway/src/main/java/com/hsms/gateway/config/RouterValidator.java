@@ -1,19 +1,19 @@
 package com.hsms.gateway.config;
 
 import java.util.List;
-import java.util.function.Predicate;
-
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 
 @Component
 public class RouterValidator {
 
-	public static final List<String> openEndpoints = List.of(
+    public static final List<String> OPEN_ENDPOINTS = List.of(
+            "/api/auth/register", 
+            "/api/auth/login"
+    );
 
-			"/api/auth/register", "/api/auth/login");
-
-	public Predicate<ServerHttpRequest> isSecured = request ->
-
-	openEndpoints.stream().noneMatch(uri -> request.getURI().getPath().contains(uri));
+    public boolean isSecured(ServerHttpRequest request) {
+        String path = request.getURI().getPath();
+        return OPEN_ENDPOINTS.stream().noneMatch(path::contains);
+    }
 }

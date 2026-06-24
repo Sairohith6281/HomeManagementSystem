@@ -1,61 +1,67 @@
 package com.hsms.analytics_service;
 
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import java.time.LocalDateTime;
-import java.util.List;
+import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.hsms.analytics_service.controller.AnalyticsController;
+import com.hsms.analytics_service.model.DashboardResponseDTO;
+import com.hsms.analytics_service.service.AnalyticsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import com.hsms.analytics_service.controller.AnalyticsController;
-import com.hsms.analytics_service.model.CategoryDistributionDTO;
-import com.hsms.analytics_service.model.DashboardResponseDTO;
-import com.hsms.analytics_service.model.TechnicianDetailResponseDTO;
-import com.hsms.analytics_service.service.AnalyticsService;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.ResponseEntity;
 
 class AnalyticsControllerTest {
 
-	private final AnalyticsService analyticsService;
-	private final AnalyticsController analyticsController;
-	private MockMvc mockMvc;
+    @Mock
+    private AnalyticsService service;
 
-	AnalyticsControllerTest() {
-		this.analyticsService = Mockito.mock(AnalyticsService.class);
-		this.analyticsController = new AnalyticsController(analyticsService);
-	}
+    @InjectMocks
+    private AnalyticsController controller;
 
-	@BeforeEach
-	void setUp() {
-		mockMvc = MockMvcBuilders.standaloneSetup(analyticsController).build();
-	}
+    private DashboardResponseDTO mockResponse;
 
-	@Test
-	void testDashboard() throws Exception {
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+        mockResponse = new DashboardResponseDTO();
+        mockResponse.setTotalBookings(10);
+        mockResponse.setRevenue(5000.0);
+    }
 
-		TechnicianDetailResponseDTO technician = new TechnicianDetailResponseDTO();
-		technician.setTechnicianId(1L);
-		technician.setTechnicianName("John");
-		technician.setRating(4.8);
+    @Test
+    void testDashboard_withAllParams() {
+        // Arrange
+        when(service.getDashboard("2024-01-01", "2024-12-31", 1L, "Hyderabad", 2L, "COMPLETED"))
+                .thenReturn(mockResponse);
 
-		CategoryDistributionDTO category = new CategoryDistributionDTO(1L, 5);
+        // Act
+        ResponseEntity<DashboardResponseDTO> response = controller.dashboard(
+                "2024-01-01", "2024-12-31", 1L, "Hyderabad", 2L, "COMPLETED");
 
-		DashboardResponseDTO response = new DashboardResponseDTO();
-		response.setTotalBookings(10);
-		response.setRevenue(5000.0);
-		response.setGeneratedAt(LocalDateTime.now());
-		response.setTopTechnicians(List.of(technician));
-		response.setCategoryDistribution(List.of(category));
+        // Assert
+        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
+        assertThat(response.getBody()).isEqualTo(mockResponse);
+        verify(service, times(1))
+                .getDashboard("2024-01-01", "2024-12-31", 1L, "Hyderabad", 2L, "COMPLETED");
+    }
 
-		when(analyticsService.getDashboard()).thenReturn(response);
+    @Test
+    void testDashboard_withNoParams() {
+        // Arrange
+        when(service.getDashboard(null, null, null, null, null, null))
+                .thenReturn(mockResponse);
 
-		mockMvc.perform(get("/api/analytics/dashboard")).andExpect(status().isOk())
-				.andExpect(jsonPath("$.totalBookings").value(10)).andExpect(jsonPath("$.revenue").value(5000.0))
-				.andExpect(jsonPath("$.topTechnicians[0].technicianId").value(1))
-				.andExpect(jsonPath("$.categoryDistribution[0].categoryId").value(1))
-				.andExpect(jsonPath("$.categoryDistribution[0].count").value(5));
-	}
+        // Act
+        ResponseEntity<DashboardResponseDTO> response = controller.dashboard(
+                null, null, null, null, null, null);
+
+        // Assert
+        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
+        assertThat(response.getBody().getTotalBookings()).isEqualTo(10);
+        assertThat(response.getBody().getRevenue()).isEqualTo(5000.0);
+        verify(service, times(1)).getDashboard(null, null, null, null, null, null);
+    }
 }

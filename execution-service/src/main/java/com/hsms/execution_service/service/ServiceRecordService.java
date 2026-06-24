@@ -8,4 +8,5 @@ public interface ServiceRecordService {
     ServiceRecordResponseDTO start(ServiceRecordRequestDTO dto);
     ServiceRecordDetailResponseDTO complete(Long id, ServiceRecordRequestDTO dto);
     ServiceRecordDetailResponseDTO get(Long id);
+    ServiceRecordDetailResponseDTO updatePaymentStatus(Long id, String status, String method);
 }

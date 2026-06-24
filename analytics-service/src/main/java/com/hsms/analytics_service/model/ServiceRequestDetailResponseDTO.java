@@ -14,8 +14,12 @@ public class ServiceRequestDetailResponseDTO {
     private Long requestId;
     private Long customerId;
     private Long categoryId;
-    private String serviceType;
+    private Long technicianId;
     private String status;
     private String address;
-    private LocalDateTime scheduledTime;
+    private LocalDateTime scheduledDateTime;
+    private LocalDateTime createdAt;
+    private Double basePrice;
+    private String categoryName;
+    private String city;
 }

@@ -9,6 +9,6 @@ import com.hsms.analytics_service.model.PaymentResponseDTO;
 @FeignClient(name = "payment-service")
 public interface PaymentClient {
 
-    @GetMapping("/api/payments")
+    @GetMapping("/api/payments/all")
     List<PaymentResponseDTO> getAllPayments();
 }

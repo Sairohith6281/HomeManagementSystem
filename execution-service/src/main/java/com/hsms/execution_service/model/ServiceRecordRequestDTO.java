@@ -19,5 +19,6 @@ public class ServiceRecordRequestDTO {
 	@Schema(description = "Payment method", allowableValues = { "ONLINE", "CASH", "CARD", "UPI" })
 	private PaymentMethod paymentMethod;
 
-	private String status;
+	private String technicianNotes;
+	private String executionNotes;
 }

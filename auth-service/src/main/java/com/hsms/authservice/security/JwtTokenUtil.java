@@ -1,12 +1,10 @@
 package com.hsms.authservice.security;
 
-import java.security.Key;
 import java.util.Date;
 
 import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import com.hsms.authservice.entity.User;
@@ -24,40 +22,40 @@ public class JwtTokenUtil {
 	@Value("${app.jwt-expiration-milliseconds}")
 	private long jwtExpirationDate;
 
-	public String generateToken(User user) {
+	private SecretKey signKey;
 
+	@jakarta.annotation.PostConstruct
+	public void init() {
+		this.signKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
+	}
+
+	public String generateToken(User user) {
 		String role = user.getRoles().iterator().next().getRoleName();
 
-		return Jwts.builder().subject(user.getEmail()).claim("userId", user.getUserId()).claim("role", role)
-				.issuedAt(new Date()).expiration(new Date(System.currentTimeMillis() + 86400000)).signWith(key())
+		return Jwts.builder()
+				.subject(user.getEmail())
+				.claim("userId", user.getUserId())
+				.claim("role", role)
+				.issuedAt(new Date())
+				.expiration(new Date(System.currentTimeMillis() + jwtExpirationDate))
+				.signWith(signKey)
 				.compact();
 	}
 
-	private Key key() {
-
-		return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
-	}
-
 	public boolean validateToken(String token) {
-
-		Jwts.parser().verifyWith((SecretKey) key()).build().parse(token);
+		Jwts.parser().verifyWith(signKey).build().parseSignedClaims(token);
 		return true;
 	}
 
 	public String getUsername(String token) {
-
-		return Jwts.parser().verifyWith((SecretKey) key()).build().parseSignedClaims(token).getPayload().getSubject();
+		return Jwts.parser().verifyWith(signKey).build().parseSignedClaims(token).getPayload().getSubject();
 	}
 
 	public Long getUserId(String token) {
-
-		return Jwts.parser().verifyWith((SecretKey) key()).build().parseSignedClaims(token).getPayload().get("userId",
-				Long.class);
+		return Jwts.parser().verifyWith(signKey).build().parseSignedClaims(token).getPayload().get("userId", Long.class);
 	}
 
 	public String getRole(String token) {
-
-		return Jwts.parser().verifyWith((SecretKey) key()).build().parseSignedClaims(token).getPayload().get("role",
-				String.class);
+		return Jwts.parser().verifyWith(signKey).build().parseSignedClaims(token).getPayload().get("role", String.class);
 	}
 }

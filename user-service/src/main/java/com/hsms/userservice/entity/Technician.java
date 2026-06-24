@@ -6,24 +6,27 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name="technicians")
+@Table(name = "technicians")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Technician {
 
-    @Id
-//    private Long technicianId;
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "technician_seq")
+	@SequenceGenerator(name = "technician_seq", sequenceName = "technician_seq", allocationSize = 1)
+	@Column(name = "technician_id")
+	private Long technicianId;
 
-    private Long userId;
+	private Long userId;
 
-    private String skill;
+	private String skill;
 
-    private Integer experience;
+	private Integer experience;
 
-    @Enumerated(EnumType.STRING)
-    private AvailabilityStatus availabilityStatus;
+	@Enumerated(EnumType.STRING)
+	private AvailabilityStatus availabilityStatus;
 
-    private Double rating;
+	private Double rating;
 }

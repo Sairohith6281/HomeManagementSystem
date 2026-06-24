@@ -19,10 +19,11 @@ public interface PaymentService {
 
 	Page<PaymentResponseDTO> getPaymentsByCustomer( Long customerId, Pageable pageable);
 
-	PaymentResponseDTO updatePaymentStatus(Long paymentId, PaymentStatus status);
+	PaymentResponseDTO updatePaymentStatus(Long paymentId, PaymentStatus status, String method);
 
 	List<PaymentResponseDTO> showAllPayments();
 
 	void deletePayment(Long paymentId);
 
+	PaymentResponseDTO getPaymentByServiceRequestId(Long serviceRequestId);
 }

@@ -2,7 +2,6 @@ package com.abc.paymentservice.model;
 
 import java.time.LocalDateTime;
 
-import com.abc.paymentservice.enums.PaymentStatus;
 
 import lombok.Data;
 
@@ -26,7 +25,7 @@ public class BookingResponseDTO {
 	private String address;
 	
 
-	private PaymentStatus status;
+	private String status;
 	
 
 	private LocalDateTime createdAt;

@@ -69,4 +69,6 @@ public class ServiceRequestResponse {
 
     @Schema(description = "Technician ID (if assigned)")
     private Long technicianId;
+    
+    private Long categoryId;
 }

@@ -1,99 +1,116 @@
 package com.hsms.analytics_service;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import java.util.List;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import com.hsms.analytics_service.entity.AnalyticsReport;
 import com.hsms.analytics_service.feignclient.BookingServiceClient;
 import com.hsms.analytics_service.feignclient.PaymentClient;
 import com.hsms.analytics_service.feignclient.TechnicianClient;
-import com.hsms.analytics_service.model.CategoryDistributionDTO;
-import com.hsms.analytics_service.model.DashboardResponseDTO;
-import com.hsms.analytics_service.model.PaymentResponseDTO;
-import com.hsms.analytics_service.model.ServiceRequestDetailResponseDTO;
-import com.hsms.analytics_service.model.TechnicianDetailResponseDTO;
+import com.hsms.analytics_service.model.*;
 import com.hsms.analytics_service.repository.AnalyticsReportRepository;
 import com.hsms.analytics_service.service.AnalyticsServiceImpl;
 
-@ExtendWith(MockitoExtension.class)
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
+
 class AnalyticsServiceImplTest {
 
-	@Mock
-	private AnalyticsReportRepository repo;
+    @Mock
+    private AnalyticsReportRepository repo;
 
-	@Mock
-	private BookingServiceClient bookingClient;
+    @Mock
+    private BookingServiceClient bookingClient;
 
-	@Mock
-	private TechnicianClient technicianClient;
+    @Mock
+    private TechnicianClient technicianClient;
 
-	@Mock
-	private PaymentClient paymentClient;
+    @Mock
+    private PaymentClient paymentClient;
 
-	@InjectMocks
-	private AnalyticsServiceImpl analyticsService;
+    @InjectMocks
+    private AnalyticsServiceImpl service;
 
-	@Test
-	void testGetDashboard() {
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
 
-		// Service Requests
-		ServiceRequestDetailResponseDTO request1 = new ServiceRequestDetailResponseDTO();
-		request1.setCategoryId(1L);
+    @Test
+    void testGetDashboard_withValidData() {
+        // Arrange: mock booking requests
+        ServiceRequestDetailResponseDTO request = new ServiceRequestDetailResponseDTO();
+        request.setRequestId(1L);
+        request.setCategoryId(10L);
+        request.setCategoryName("Electrical");
+        request.setCity("Hyderabad");
+        request.setTechnicianId(100L);
+        request.setStatus("COMPLETED");
+        request.setScheduledDateTime(LocalDateTime.now());
 
-		ServiceRequestDetailResponseDTO request2 = new ServiceRequestDetailResponseDTO();
-		request2.setCategoryId(2L);
+        when(bookingClient.getAllRequests()).thenReturn(List.of(request));
 
-		when(bookingClient.getAllRequests()).thenReturn(List.of(request1, request2));
+        // Mock technician
+        TechnicianDetailResponseDTO technician = new TechnicianDetailResponseDTO();
+        technician.setTechnicianId(100L);
+        technician.setTechnicianName("John");
+        technician.setRating(4.5);
 
-		// Technicians
-		TechnicianDetailResponseDTO tech1 = new TechnicianDetailResponseDTO();
-		tech1.setTechnicianId(1L);
-		tech1.setRating(4.9);
+        when(technicianClient.getAllTechnicians()).thenReturn(List.of(technician));
 
-		TechnicianDetailResponseDTO tech2 = new TechnicianDetailResponseDTO();
-		tech2.setTechnicianId(2L);
-		tech2.setRating(4.5);
+        // Mock payment
+        PaymentResponseDTO payment = new PaymentResponseDTO();
+        payment.setServiceRequestId(1L);
+        payment.setPaymentStatus("SUCCESS");
+        payment.setAmount(500.0);
 
-		when(technicianClient.getAllTechnicians()).thenReturn(List.of(tech1, tech2));
+        when(paymentClient.getAllPayments()).thenReturn(List.of(payment));
 
-		// Payments
-		PaymentResponseDTO payment1 = new PaymentResponseDTO();
-		payment1.setAmount(1000.0);
+        // Mock repo save
+        when(repo.save(any(AnalyticsReport.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-		PaymentResponseDTO payment2 = new PaymentResponseDTO();
-		payment2.setAmount(2500.0);
+        // Act
+        DashboardResponseDTO response = service.getDashboard(null, null, null, null, null, null);
 
-		when(paymentClient.getAllPayments()).thenReturn(List.of(payment1, payment2));
+        // Assert
+        assertThat(response.getTotalBookings()).isEqualTo(1);
+        assertThat(response.getRevenue()).isEqualTo(500.0);
+        assertThat(response.getCompletedServices()).isEqualTo(1);
+        assertThat(response.getPaymentSuccessRate()).isEqualTo(100.0);
+        assertThat(response.getAverageRating()).isEqualTo(4.5);
+        assertThat(response.getTopTechnicians()).hasSize(1);
+        assertThat(response.getRevenueByCategory()).containsEntry("Electrical", 500.0);
 
-		when(repo.save(any(AnalyticsReport.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        verify(repo, times(1)).save(any(AnalyticsReport.class));
+        verify(bookingClient, times(1)).getAllRequests();
+        verify(technicianClient, times(1)).getAllTechnicians();
+        verify(paymentClient, times(1)).getAllPayments();
+    }
 
-		// Act
-		DashboardResponseDTO response = analyticsService.getDashboard();
+    @Test
+    void testGetDashboard_withNoData() {
+        // Arrange empty lists
+        when(bookingClient.getAllRequests()).thenReturn(List.of());
+        when(technicianClient.getAllTechnicians()).thenReturn(List.of());
+        when(paymentClient.getAllPayments()).thenReturn(List.of());
 
-		// Assert
-		assertNotNull(response);
-		assertEquals(2, response.getTotalBookings());
-		assertEquals(3500.0, response.getRevenue());
-		assertNotNull(response.getGeneratedAt());
+        when(repo.save(any(AnalyticsReport.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-		assertEquals(2, response.getTopTechnicians().size());
-		assertEquals(4.9, response.getTopTechnicians().get(0).getRating());
+        // Act
+        DashboardResponseDTO response = service.getDashboard(null, null, null, null, null, null);
 
-		List<CategoryDistributionDTO> categories = response.getCategoryDistribution();
+        // Assert
+        assertThat(response.getTotalBookings()).isEqualTo(0);
+        assertThat(response.getRevenue()).isEqualTo(0.0);
+        assertThat(response.getPaymentSuccessRate()).isEqualTo(0.0);
+        assertThat(response.getAverageRating()).isEqualTo(0.0);
+        assertThat(response.getTopTechnicians()).isEmpty();
+        assertThat(response.getRevenueByCategory()).isEmpty();
 
-		assertEquals(2, categories.size());
-
-		verify(bookingClient).getAllRequests();
-		verify(technicianClient).getAllTechnicians();
-		verify(paymentClient).getAllPayments();
-		verify(repo).save(any(AnalyticsReport.class));
-
-		verifyNoMoreInteractions(bookingClient, technicianClient, paymentClient, repo);
-	}
+        verify(repo, times(1)).save(any(AnalyticsReport.class));
+    }
 }

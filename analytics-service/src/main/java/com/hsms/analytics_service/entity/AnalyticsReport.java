@@ -31,6 +31,21 @@ public class AnalyticsReport {
 	@Column(name = "total_revenue", nullable = false)
 	private Double revenue;
 
+	@Column(name = "completed_services")
+	private Integer completedServices;
+
+	@Column(name = "cancelled_services")
+	private Integer cancelledServices;
+
+	@Column(name = "payment_success_rate")
+	private Double paymentSuccessRate;
+
+	@Column(name = "average_rating")
+	private Double averageRating;
+
+	@Column(name = "service_completion_rate")
+	private Double serviceCompletionRate;
+
 	@Column(name = "generated_at", nullable = false)
 	private LocalDateTime generatedAt;
 }

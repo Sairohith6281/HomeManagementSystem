@@ -33,8 +33,9 @@ public class Feedback {
     @Max(value = 5, message = "Rating must be between 1 and 5")
     private Integer rating;
 
-    @NotBlank(message = "Comments cannot be empty")
     private String comments;
+
+    private Long technicianId;
 
     private LocalDateTime feedbackDate;
 
@@ -89,6 +90,14 @@ public class Feedback {
         this.feedbackDate = feedbackDate;
     }
 
+    public Long getTechnicianId() {
+        return technicianId;
+    }
+
+    public void setTechnicianId(Long technicianId) {
+        this.technicianId = technicianId;
+    }
+
     @PrePersist
     public void prePersist() {
         this.feedbackDate = LocalDateTime.now();
@@ -98,6 +107,6 @@ public class Feedback {
     public String toString() {
         return "Feedback [feedbackId=" + feedbackId + ", userId=" + userId
                 + ", serviceRequestId=" + serviceRequestId + ", rating=" + rating
-                + ", comments=" + comments + ", feedbackDate=" + feedbackDate + "]";
+                + ", comments=" + comments + ", technicianId=" + technicianId + ", feedbackDate=" + feedbackDate + "]";
     }
 }
