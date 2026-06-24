@@ -2,11 +2,14 @@ package com.hsms.userservice.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.hsms.userservice.entity.Customer;
 import com.hsms.userservice.entity.Technician;
@@ -21,35 +24,61 @@ import com.hsms.userservice.repository.CustomerRepository;
 import com.hsms.userservice.repository.TechnicianRepository;
 
 @Service
+@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
 
-	@Autowired
-	private CustomerRepository customerRepository;
+	private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
 
-	@Autowired
-	private TechnicianRepository technicianRepository;
+	private final CustomerRepository customerRepository;
+	private final TechnicianRepository technicianRepository;
+	private final AuthFeignClient authFeignClient;
+	private final ModelMapper modelMapper;
 
-	@Autowired
-	private AuthFeignClient authFeignClient;
+	public UserServiceImpl(CustomerRepository customerRepository,
+							TechnicianRepository technicianRepository,
+							AuthFeignClient authFeignClient,
+							ModelMapper modelMapper) {
+		this.customerRepository = customerRepository;
+		this.technicianRepository = technicianRepository;
+		this.authFeignClient = authFeignClient;
+		this.modelMapper = modelMapper;
+	}
 
-	@Autowired
-	private ModelMapper modelMapper;
+	private UserProfileResponseDTO fetchUserProfile(Long userId) {
 
-	//
+	    if (userId == null) {
+	        log.error("userId is NULL - skipping Feign call");
+	        UserProfileResponseDTO fallback = new UserProfileResponseDTO();
+	        fallback.setUserId(null);
+	        fallback.setName("Unknown User");
+	        fallback.setEmail("unknown@example.com");
+	        return fallback;
+	    }
+
+	    try {
+	        return authFeignClient.getUserById(userId);
+	    } catch (Exception ex) {
+	        log.warn("Failed Feign call for userId={}", userId, ex);
+	    }
+
+	    UserProfileResponseDTO fallback = new UserProfileResponseDTO();
+	    fallback.setUserId(userId);
+	    fallback.setName("Unknown User");
+	    fallback.setEmail("unknown@example.com");
+	    return fallback;
+	}
+
 	@Override
+	@Transactional
 	public CustomerDetailResponseDTO createCustomer(CustomerProfileRequestDTO dto, Long userId, String email) {
-
-		Customer customer = modelMapper.map(dto, Customer.class); // converted to Entity
-
+		Customer customer = modelMapper.map(dto, Customer.class);
 		customer.setUserId(userId);
-		customer.setCreatedAt(LocalDateTime.now()); // Add this
+		customer.setCreatedAt(LocalDateTime.now());
 		
 		Customer saved = customerRepository.save(customer);
-		
-		UserProfileResponseDTO user = authFeignClient.getUserById(userId);
+		UserProfileResponseDTO user = fetchUserProfile(userId);
 
 		CustomerDetailResponseDTO response = modelMapper.map(saved, CustomerDetailResponseDTO.class);
-
 		response.setUserId(userId);
 		response.setEmail(email);
 		response.setName(user.getName());
@@ -58,23 +87,20 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	@Transactional
 	public CustomerDetailResponseDTO updateCustomer(Long userId, CustomerProfileRequestDTO dto) {
-
 		Customer customer = customerRepository.findByUserId(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("Customer Not Found"));
 
-	//	customer.setName(dto.getName()); // Manual
-		customer.setAddress(dto.getAddress()); // Manual
-		customer.setCity(dto.getCity()); // Manual
-		customer.setPincode(dto.getPincode()); // Manual
-		customer.setCreatedAt(LocalDateTime.now()); // Default Update time;
+		customer.setAddress(dto.getAddress());
+		customer.setCity(dto.getCity());
+		customer.setPincode(dto.getPincode());
+		customer.setCreatedAt(LocalDateTime.now());
 
 		Customer updated = customerRepository.save(customer);
-
-		UserProfileResponseDTO user = authFeignClient.getUserById(userId);
+		UserProfileResponseDTO user = fetchUserProfile(userId);
 
 		CustomerDetailResponseDTO response = modelMapper.map(updated, CustomerDetailResponseDTO.class);
-
 		response.setUserId(user.getUserId());
 		response.setName(user.getName());
 		response.setEmail(user.getEmail());
@@ -84,14 +110,12 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public CustomerDetailResponseDTO getCustomer(Long userId) {
-
 		Customer customer = customerRepository.findByUserId(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("Customer Not Found"));
 
-		UserProfileResponseDTO user = authFeignClient.getUserById(userId);
+		UserProfileResponseDTO user = fetchUserProfile(userId);
 
 		CustomerDetailResponseDTO response = modelMapper.map(customer, CustomerDetailResponseDTO.class);
-
 		response.setUserId(user.getUserId());
 		response.setName(user.getName());
 		response.setEmail(user.getEmail());
@@ -101,25 +125,21 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public List<CustomerDetailResponseDTO> getAllCustomers() {
-
 		return customerRepository.findAll().stream().map(customer -> {
-
-			UserProfileResponseDTO user = authFeignClient.getUserById(customer.getUserId());
+			UserProfileResponseDTO user = fetchUserProfile(customer.getUserId());
 
 			CustomerDetailResponseDTO dto = modelMapper.map(customer, CustomerDetailResponseDTO.class);
-
 			dto.setUserId(user.getUserId());
 			dto.setName(user.getName());
 			dto.setEmail(user.getEmail());
 
 			return dto;
-
 		}).collect(Collectors.toList());
 	}
 
 	@Override
+	@Transactional
 	public void deleteCustomer(Long userId) {
-
 		Customer customer = customerRepository.findByUserId(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("Customer Not Found"));
 
@@ -128,14 +148,12 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public CustomerDetailResponseDTO getCustomerById(Long customerId) {
-
 		Customer customer = customerRepository.findById(customerId)
 				.orElseThrow(() -> new ResourceNotFoundException("Customer Not Found"));
 
-		UserProfileResponseDTO user = authFeignClient.getUserById(customer.getUserId());
+		UserProfileResponseDTO user = fetchUserProfile(customer.getUserId());
 
 		CustomerDetailResponseDTO response = modelMapper.map(customer, CustomerDetailResponseDTO.class);
-
 		response.setUserId(user.getUserId());
 		response.setName(user.getName());
 		response.setEmail(user.getEmail());
@@ -146,28 +164,27 @@ public class UserServiceImpl implements UserService {
 	// ================= TECHNICIAN =================
 
 	@Override
+	@Transactional
 	public TechnicianDetailResponseDTO createTechnician(TechnicianProfileRequestDTO dto) {
-
-		UserProfileResponseDTO user = authFeignClient.getUserById(dto.getUserId());
+		UserProfileResponseDTO user = fetchUserProfile(dto.getUserId());
 
 		Technician technician = modelMapper.map(dto, Technician.class);
-
 		technician.setRating(0.0);
+		technician.setTechnicianId(dto.getTechnicianId());
 
 		Technician saved = technicianRepository.save(technician);
 
 		TechnicianDetailResponseDTO response = modelMapper.map(saved, TechnicianDetailResponseDTO.class);
-
+		response.setTechnicianId(saved.getTechnicianId());
 		response.setUserId(user.getUserId());
 		response.setName(user.getName());
 		response.setEmail(user.getEmail());
-
 		return response;
 	}
 
 	@Override
+	@Transactional
 	public TechnicianDetailResponseDTO updateTechnician(Long userId, TechnicianProfileRequestDTO dto) {
-
 		Technician technician = technicianRepository.findByUserId(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("Technician Not Found"));
 
@@ -176,56 +193,61 @@ public class UserServiceImpl implements UserService {
 		technician.setAvailabilityStatus(dto.getAvailabilityStatus());
 
 		Technician updated = technicianRepository.save(technician);
-
-		UserProfileResponseDTO user = authFeignClient.getUserById(userId);
+		UserProfileResponseDTO user = fetchUserProfile(userId);
 
 		TechnicianDetailResponseDTO response = modelMapper.map(updated, TechnicianDetailResponseDTO.class);
-
 		response.setUserId(user.getUserId());
 		response.setName(user.getName());
 		response.setEmail(user.getEmail());
-
+		response.setTechnicianId(updated.getTechnicianId());
+		
 		return response;
 	}
 
 	@Override
 	public TechnicianDetailResponseDTO getTechnician(Long userId) {
-
 		Technician technician = technicianRepository.findByUserId(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("Technician Not Found"));
 
-		UserProfileResponseDTO user = authFeignClient.getUserById(userId);
+		UserProfileResponseDTO user = fetchUserProfile(userId);
 
 		TechnicianDetailResponseDTO response = modelMapper.map(technician, TechnicianDetailResponseDTO.class);
-
 		response.setUserId(user.getUserId());
 		response.setName(user.getName());
 		response.setEmail(user.getEmail());
+		response.setTechnicianId(technician.getTechnicianId());
 
 		return response;
 	}
 
 	@Override
 	public List<TechnicianDetailResponseDTO> getAllTechnicians() {
+		return technicianRepository.findAll().stream()
+			.filter(Objects::nonNull)
+			.filter(technician -> {
+				if (technician.getUserId() == null) {
+					log.warn("Skipping technician with null userId: {}", technician);
+					return false;
+				}
+				return true;
+			})
+			.map(technician -> {
+				UserProfileResponseDTO user = fetchUserProfile(technician.getUserId());
 
-		return technicianRepository.findAll().stream().map(technician -> {
+				TechnicianDetailResponseDTO dto = modelMapper.map(technician, TechnicianDetailResponseDTO.class);
+				dto.setUserId(user.getUserId());
+				dto.setName(user.getName());
+				dto.setEmail(user.getEmail());
+				dto.setTechnicianId(technician.getTechnicianId());
 
-			UserProfileResponseDTO user = authFeignClient.getUserById(technician.getUserId());
-
-			TechnicianDetailResponseDTO dto = modelMapper.map(technician, TechnicianDetailResponseDTO.class);
-
-			dto.setUserId(user.getUserId());
-			dto.setName(user.getName());
-			dto.setEmail(user.getEmail());
-
-			return dto;
-
-		}).collect(Collectors.toList());
+				return dto;
+			})
+			.collect(Collectors.toList());
 	}
 
 	@Override
+	@Transactional
 	public void deleteTechnician(Long userId) {
-
 		Technician technician = technicianRepository.findByUserId(userId)
 				.orElseThrow(() -> new ResourceNotFoundException("Technician Not Found"));
 
@@ -234,19 +256,37 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public TechnicianDetailResponseDTO getTechnicianById(Long technicianId) {
+		Technician technician = technicianRepository.findByUserId(technicianId)
+				.orElseGet(() -> technicianRepository.findById(technicianId)
+						.orElseThrow(() -> new ResourceNotFoundException("Technician Not Found")));
 
-		Technician technician = technicianRepository.findById(technicianId)
-				.orElseThrow(() -> new ResourceNotFoundException("Technician Not Found"));
-
-		UserProfileResponseDTO user = authFeignClient.getUserById(technician.getUserId());
+		UserProfileResponseDTO user = fetchUserProfile(technician.getUserId());
 
 		TechnicianDetailResponseDTO response = modelMapper.map(technician, TechnicianDetailResponseDTO.class);
-
 		response.setUserId(user.getUserId());
 		response.setName(user.getName());
 		response.setEmail(user.getEmail());
-
+		response.setTechnicianId(technician.getTechnicianId());
+		
 		return response;
 	}
 
+	@Override
+	@Transactional
+	public TechnicianDetailResponseDTO updateTechnicianRating(Long technicianId, Double rating) {
+		Technician technician = technicianRepository.findByUserId(technicianId)
+				.orElseGet(() -> technicianRepository.findById(technicianId)
+						.orElseThrow(() -> new ResourceNotFoundException("Technician Not Found")));
+		technician.setRating(rating);
+		
+		Technician updated = technicianRepository.save(technician);
+		UserProfileResponseDTO user = fetchUserProfile(updated.getUserId());
+		
+		TechnicianDetailResponseDTO response = modelMapper.map(updated, TechnicianDetailResponseDTO.class);
+		response.setUserId(user.getUserId());
+		response.setName(user.getName());
+		response.setEmail(user.getEmail());
+		response.setTechnicianId(updated.getTechnicianId());
+		return response;
+	}
 }

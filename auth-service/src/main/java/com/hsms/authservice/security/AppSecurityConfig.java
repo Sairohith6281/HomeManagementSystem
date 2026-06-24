@@ -1,6 +1,5 @@
 package com.hsms.authservice.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,11 +15,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class AppSecurityConfig {
 
-	@Autowired
-	private JwtAuthenticationFilter authenticationFilter;
+	private final JwtAuthenticationFilter authenticationFilter;
+	private final JwtAuthenticationEntryPoint authenticationEntryPoint;
 
-	@Autowired
-	private JwtAuthenticationEntryPoint authenticationEntryPoint;
+	public AppSecurityConfig(JwtAuthenticationFilter authenticationFilter,
+							JwtAuthenticationEntryPoint authenticationEntryPoint) {
+		this.authenticationFilter = authenticationFilter;
+		this.authenticationEntryPoint = authenticationEntryPoint;
+	}
 
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -29,20 +31,14 @@ public class AppSecurityConfig {
 
 		auth.requestMatchers("/api/auth/**").permitAll()
 
-				/*
-				 * .requestMatchers("/api/admin/**").hasAnyAuthority("ADMIN")
-				 * 
-				 * .requestMatchers("/api/customer/**").hasAuthority("CUSTOMER")
-				 * 
-				 * .requestMatchers("/api/technician/**").hasAuthority("TECHNICIAN")
-				 */
-				.requestMatchers("/api/admin/**").hasRole("ADMIN")
 
-				.requestMatchers("/api/customer/**").hasRole("CUSTOMER")
+				.requestMatchers("/api/admin/**").hasAuthority("ADMIN")
 
-				.requestMatchers("/api/technician/**").hasRole("TECHNICIAN")
+				.requestMatchers("/api/customer/**").hasAuthority("CUSTOMER")
 
-				.requestMatchers("/api/service-manager/**").hasRole("SERVICE_MANAGER")
+				.requestMatchers("/api/technician/**").hasAuthority("TECHNICIAN")
+
+				.requestMatchers("/api/service-manager/**").hasAuthority("SERVICE_MANAGER")
 
 				.anyRequest().authenticated());
 

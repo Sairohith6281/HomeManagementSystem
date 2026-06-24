@@ -1,8 +1,7 @@
 package com.hsms.execution_service.model;
 
-import com.hsms.execution_service.entity.PaymentMethod;
-
-import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,11 +11,13 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class PaymentResponseDTO {
     private Long paymentId;
-    private Long serviceRequestId;
+    private Long bookingId;
+    private Long customerId;
     private Double amount;
-    @Schema(description = "Payment method", allowableValues = {"ONLINE", "CASH", "CARD", "UPI"})
-    private PaymentMethod method;
-    private String status; // e.g., SUCCESS, FAILED, PENDING
+    private String paymentMethod;
+    private String status;
+    private LocalDateTime paymentDate;
 }

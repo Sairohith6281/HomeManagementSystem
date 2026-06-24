@@ -11,38 +11,29 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private final HeaderAuthenticationFilter filter;
+	private final HeaderAuthenticationFilter filter;
 
-    public SecurityConfig(HeaderAuthenticationFilter filter) {
-        this.filter = filter;
-    }
+	public SecurityConfig(HeaderAuthenticationFilter filter) {
+		this.filter = filter;
+	}
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http)
-            throws Exception {
+	@Bean
+	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http
-            .csrf(csrf -> csrf.disable())
+		http.csrf(csrf -> csrf.disable())
 
-            .authorizeHttpRequests(auth -> auth
+				.authorizeHttpRequests(auth -> auth
 
-                // Swagger and Error URLs
-                .requestMatchers(
-                        "/swagger-ui/**",
-                        "/swagger-ui.html",
-                        "/v3/api-docs/**",
-                        "/v3/api-docs",
-                        "/error"
-                ).permitAll()
+						// Swagger and Error URLs
+						.requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/v3/api-docs",
+								"/error")
+						.permitAll()
 
-                // All other APIs require authentication
-                .anyRequest().authenticated()
-            )
+						// All other APIs require authentication
+						.anyRequest().authenticated())
 
-            .addFilterBefore(
-                    filter,
-                    UsernamePasswordAuthenticationFilter.class);
+				.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
 
-        return http.build();
-    }
+		return http.build();
+	}
 }

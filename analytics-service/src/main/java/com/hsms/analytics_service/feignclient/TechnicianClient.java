@@ -5,7 +5,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import com.hsms.analytics_service.model.TechnicianDetailResponseDTO;
 
-@FeignClient(name = "technician-service")
+@FeignClient(name = "user-service")
 public interface TechnicianClient {
 
     @GetMapping("/api/technicians")

@@ -1,9 +1,7 @@
 package com.hsms.execution_service.model;
 
 import java.time.LocalDateTime;
-
-import com.hsms.execution_service.entity.PaymentMethod;
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,11 +11,13 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class PaymentDetailResponseDTO {
     private Long paymentId;
-    private Long serviceRequestId;
+    private Long bookingId;
+    private Long customerId;
     private Double amount;
-    private PaymentMethod method;
+    private String paymentMethod;
     private String status;
-    private LocalDateTime createdAt;
+    private LocalDateTime paymentDate;
 }

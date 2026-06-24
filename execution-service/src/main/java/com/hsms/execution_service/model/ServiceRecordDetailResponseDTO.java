@@ -18,4 +18,8 @@ public class ServiceRecordDetailResponseDTO {
     private String remarks;
     private Double actualCost;
     private String paymentMethod;
+    private String status;
+    private String paymentStatus;
+    private String technicianNotes;
+    private String executionNotes;
 }

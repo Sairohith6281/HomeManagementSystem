@@ -15,24 +15,10 @@ public class FeignClientInterceptor implements RequestInterceptor {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (attributes != null) {
             HttpServletRequest request = attributes.getRequest();
-            String userId = request.getHeader("X-User-Id");
-            String email = request.getHeader("X-User-Email");
-            String role = request.getHeader("X-User-Role");
-
-            if (userId != null) {
-                System.out.println("booking-service Feign interceptor forwarding X-User-Id: " + userId);
-                template.header("X-User-Id", userId);
+            String authHeader = request.getHeader("Authorization");
+            if (authHeader != null) {
+                template.header("Authorization", authHeader);
             }
-            if (email != null) {
-                System.out.println("booking-service Feign interceptor forwarding X-User-Email: " + email);
-                template.header("X-User-Email", email);
-            }
-            if (role != null) {
-                System.out.println("booking-service Feign interceptor forwarding X-User-Role: " + role);
-                template.header("X-User-Role", role);
-            }
-        } else {
-            System.out.println("booking-service Feign interceptor: RequestContextAttributes is NULL!");
         }
     }
 }

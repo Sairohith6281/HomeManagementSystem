@@ -6,6 +6,10 @@ import com.hsms.userservice.exception.AccessDeniedException;
 
 public class RoleValidator {
 
+    private RoleValidator() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static void validate(String role,
                                 String... allowedRoles) {
 

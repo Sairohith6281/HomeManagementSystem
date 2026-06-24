@@ -8,6 +8,6 @@ import com.hsms.analytics_service.model.ServiceRequestDetailResponseDTO;
 @FeignClient(name = "booking-service")
 public interface BookingServiceClient {
 
-    @GetMapping("/api/requests")
+    @GetMapping("/api/service-requests/summary")
     List<ServiceRequestDetailResponseDTO> getAllRequests();
 }

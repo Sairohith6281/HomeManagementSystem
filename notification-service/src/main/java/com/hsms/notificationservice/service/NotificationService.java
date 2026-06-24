@@ -15,4 +15,6 @@ public interface NotificationService {
     Notification updateNotification(Long id, Notification notification);
 
     void deleteNotification(Long id);
+
+    void sendNotificationAsync(Notification notification);
 }

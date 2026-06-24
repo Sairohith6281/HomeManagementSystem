@@ -1,8 +1,13 @@
 package com.hsms.booking.security;
 
 import java.util.Arrays;
+import org.springframework.security.access.AccessDeniedException;
 
-public class RoleValidator {
+public final class RoleValidator {
+
+	private RoleValidator() {
+		throw new IllegalStateException("Utility class");
+	}
 
 	public static void validate(String role, String... allowedRoles) {
 
@@ -10,7 +15,7 @@ public class RoleValidator {
 
 		if (!allowed) {
 
-			throw new RuntimeException("Access Denied");
+			throw new AccessDeniedException("Access Denied");
 		}
 	}
 }

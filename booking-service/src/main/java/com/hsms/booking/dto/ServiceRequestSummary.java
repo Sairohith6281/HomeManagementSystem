@@ -25,4 +25,5 @@ public class ServiceRequestSummary {
 	private BigDecimal basePrice;
 	private String categoryName;
 	private LocalDateTime scheduledDateTime;
+	private String city;
 }

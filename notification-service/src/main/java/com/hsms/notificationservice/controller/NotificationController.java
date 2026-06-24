@@ -35,7 +35,8 @@ public class NotificationController {
         notification.setMessage(notificationDTO.getMessage());
         notification.setStatus(notificationDTO.getStatus());
 
-        return notificationService.saveNotification(notification);
+        Notification saved = notificationService.saveNotification(notification);
+        return saved;
     }
 
     @GetMapping

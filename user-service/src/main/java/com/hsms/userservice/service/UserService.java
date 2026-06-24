@@ -9,8 +9,7 @@ import com.hsms.userservice.model.TechnicianProfileRequestDTO;
 
 public interface UserService {
 
-//	CustomerDetailResponseDTO createCustomer(
-//            CustomerProfileRequestDTO dto);
+
 
     CustomerDetailResponseDTO updateCustomer(
             Long userId,
@@ -42,9 +41,10 @@ public interface UserService {
 	CustomerDetailResponseDTO getCustomerById(Long customerId);
 	
 	
-	//
 	CustomerDetailResponseDTO createCustomer(
 	        CustomerProfileRequestDTO dto,
 	        Long userId,
 	        String email);
+
+	TechnicianDetailResponseDTO updateTechnicianRating(Long technicianId, Double rating);
 }

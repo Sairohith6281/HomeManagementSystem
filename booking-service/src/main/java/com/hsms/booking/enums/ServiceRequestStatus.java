@@ -10,7 +10,9 @@ public enum ServiceRequestStatus {
     IN_PROGRESS("In Progress"),
     COMPLETED("Completed"),
     PAID("Paid"),
-    CANCELLED("Cancelled");
+    CANCELLED("Cancelled"),
+    REJECTED("Rejected"),
+    REASSIGNED("Reassigned");
 
     private final String displayName;
 

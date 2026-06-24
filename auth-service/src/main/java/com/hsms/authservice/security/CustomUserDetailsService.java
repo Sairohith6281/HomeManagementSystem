@@ -3,7 +3,6 @@ package com.hsms.authservice.security;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -25,7 +24,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 		User user = repository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
 
 		List<SimpleGrantedAuthority> authorities = user.getRoles().stream()
-				.map(role -> new SimpleGrantedAuthority("ROLE_" + role.getRoleName())).toList();
+				.map(role -> new SimpleGrantedAuthority(role.getRoleName())).toList();
 
 		return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), authorities);
 	}

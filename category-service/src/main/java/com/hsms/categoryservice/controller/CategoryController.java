@@ -21,14 +21,16 @@ import com.hsms.categoryservice.model.CategoryResponseDTO;
 import com.hsms.categoryservice.service.CategoryService;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @Valid
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/categories")
 public class CategoryController {
 
-	@Autowired
-	private CategoryService categoryService;
+	
+	private final CategoryService categoryService;
 
 	@PostMapping
 	public ResponseEntity<CategoryResponseDTO> addCategory(@Valid @RequestBody CategoryRequestDTO category) {
